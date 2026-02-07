@@ -16,6 +16,7 @@ import { Testimonial } from './testimonials/entities/testimonial.entity';
 import { Enquiry } from './enquiries/entities/enquiry.entity';
 import { PopupsModule } from './popups/popups.module';
 import { Popup } from './popups/entities/popup.entity';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { Popup } from './popups/entities/popup.entity';
         synchronize: config.get<string>('NODE_ENV') !== 'production',
       }),
     }),
-    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule
+    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule
   ],
   controllers: [AppController],
   providers: [AppService],

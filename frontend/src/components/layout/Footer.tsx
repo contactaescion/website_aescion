@@ -37,9 +37,9 @@ export function Footer() {
                                     </a>
                                 </li>
                             ))}
-                            <li>
+                            {/* <li>
                                 <a href="/admin/login" className="text-gray-300 hover:text-white transition-colors text-sm">Admin Login</a>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
 

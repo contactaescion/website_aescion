@@ -1,4 +1,4 @@
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import { LayoutDashboard, BookOpen, Image, Users, LogOut, Menu } from 'lucide-react';
 
@@ -6,10 +6,8 @@ export function AdminLayout() {
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [isProfileOpen, setProfileOpen] = useState(false);
 
-    // Check auth
-    const isAuthenticated = !!localStorage.getItem('access_token');
+    // Auth is now handled by ProtectedRoute wrapper in App.tsx
 
-    if (!isAuthenticated) return <Navigate to="/admin/login" />;
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
@@ -21,7 +19,7 @@ export function AdminLayout() {
 
     const handleLogout = () => {
         if (confirm('Are you sure you want to logout?')) {
-            localStorage.removeItem('access_token');
+            sessionStorage.removeItem('access_token');
             window.location.href = '/admin/login';
         }
     };

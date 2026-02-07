@@ -1,10 +1,11 @@
 import { Repository } from 'typeorm';
 import { Enquiry } from './entities/enquiry.entity';
 import { CreateEnquiryDto } from './dto/create-enquiry.dto';
+import { MailService } from '../mail/mail.service';
 export declare class EnquiriesService {
     private repo;
-    private transporter;
-    constructor(repo: Repository<Enquiry>);
+    private mailService;
+    constructor(repo: Repository<Enquiry>, mailService: MailService);
     create(dto: CreateEnquiryDto): Promise<Enquiry>;
     findAll(): Promise<Enquiry[]>;
     updateStatus(id: number, status: string): Promise<Enquiry | null>;

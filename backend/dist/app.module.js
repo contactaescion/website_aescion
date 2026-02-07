@@ -25,6 +25,7 @@ const testimonial_entity_1 = require("./testimonials/entities/testimonial.entity
 const enquiry_entity_1 = require("./enquiries/entities/enquiry.entity");
 const popups_module_1 = require("./popups/popups.module");
 const popup_entity_1 = require("./popups/entities/popup.entity");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -46,7 +47,7 @@ exports.AppModule = AppModule = __decorate([
                     synchronize: config.get('NODE_ENV') !== 'production',
                 }),
             }),
-            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule
+            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

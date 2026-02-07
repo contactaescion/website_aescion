@@ -12,12 +12,13 @@ const typeorm_1 = require("@nestjs/typeorm");
 const enquiries_service_1 = require("./enquiries.service");
 const enquiries_controller_1 = require("./enquiries.controller");
 const enquiry_entity_1 = require("./entities/enquiry.entity");
+const mail_module_1 = require("../mail/mail.module");
 let EnquiriesModule = class EnquiriesModule {
 };
 exports.EnquiriesModule = EnquiriesModule;
 exports.EnquiriesModule = EnquiriesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([enquiry_entity_1.Enquiry])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([enquiry_entity_1.Enquiry]), mail_module_1.MailModule],
         controllers: [enquiries_controller_1.EnquiriesController],
         providers: [enquiries_service_1.EnquiriesService],
     })

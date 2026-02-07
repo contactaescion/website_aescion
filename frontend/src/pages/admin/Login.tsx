@@ -15,7 +15,7 @@ export function Login() {
         try {
             setError('');
             const result = await auth.login(data.email, data.password);
-            localStorage.setItem('access_token', result.access_token);
+            sessionStorage.setItem('access_token', result.access_token);
             navigate('/admin/dashboard');
         } catch (err: any) {
             console.error('Login failed', err);

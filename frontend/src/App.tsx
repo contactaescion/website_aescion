@@ -10,6 +10,8 @@ import { EnquiriesManager } from './pages/admin/EnquiriesManager';
 import { PopupManager } from './pages/admin/PopupManager';
 import { ScrollNavigation } from './components/layout/ScrollNavigation';
 import { Dashboard } from './pages/admin/Dashboard';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+
 
 
 
@@ -25,14 +27,16 @@ function App() {
         <Route path="/admin/forgot-password" element={<ForgotPassword />} />
         <Route path="/admin/reset-password" element={<ResetPassword />} />
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="courses" element={<CoursesManager />} />
-          <Route path="gallery" element={<GalleryManager />} />
-          <Route path="enquiries" element={<EnquiriesManager />} />
-          <Route path="popups" element={<PopupManager />} />
-          {/* Default redirect */}
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="courses" element={<CoursesManager />} />
+            <Route path="gallery" element={<GalleryManager />} />
+            <Route path="enquiries" element={<EnquiriesManager />} />
+            <Route path="popups" element={<PopupManager />} />
+            {/* Default redirect */}
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
