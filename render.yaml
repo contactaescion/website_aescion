@@ -15,6 +15,16 @@ services:
         generateValue: true
       - key: ALLOWED_ORIGINS
         value: "*"
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_BUCKET
+        value: aescion-gallery
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
+        sync: false
 
 # Frontend Static Site (Must be at the root level, not inside 'services')
 staticsites:

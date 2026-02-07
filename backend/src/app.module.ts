@@ -43,6 +43,7 @@ import { MailModule } from './mail/mail.module';
           database: config.get<string>('DB_DATABASE'),
           entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
           synchronize: config.get<string>('NODE_ENV') !== 'production',
+          ssl: config.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
         };
       },
     }),
