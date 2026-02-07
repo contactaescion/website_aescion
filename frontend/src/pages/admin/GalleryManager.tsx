@@ -5,7 +5,7 @@ import { Input } from '../../components/ui-kit/Input';
 import { Card } from '../../components/ui-kit/Card';
 import { Trash2, UploadCloud } from 'lucide-react';
 
-const API_URL = 'http://localhost:3000'; // Should be env var in prod
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export function GalleryManager() {
     const [images, setImages] = useState([]);

@@ -57,7 +57,8 @@ export class AuthService {
         // Let's assume for now I should add 'update' to UsersService or use it.
         // Wait, I should verify UsersService. 
 
-        const resetLink = `http://localhost:5173/admin/reset-password?token=${token}`;
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetLink = `${frontendUrl}/admin/reset-password?token=${token}`;
         console.log(`Generated reset link: ${resetLink}`);
 
         try {
