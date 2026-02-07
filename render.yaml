@@ -3,7 +3,7 @@ services:
   - type: web
     name: aescion-backend
     env: node
-    buildCommand: cd backend && npm install && npm run build
+    buildCommand: cd backend && npm install --production=false && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
       - key: NODE_ENV
@@ -15,10 +15,9 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
 
-  # Frontend Static Site
-  - type: web
-    name: aescion-frontend
-    runtime: static
+# Frontend Static Site
+staticSites:
+  - name: aescion-frontend
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
@@ -28,6 +27,6 @@ services:
     envVars:
       - key: VITE_API_URL
         fromService:
-          name: aescion-backend
           type: web
+          name: aescion-backend
           property: hostport
