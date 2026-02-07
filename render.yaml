@@ -3,7 +3,8 @@ services:
   - type: web
     name: aescion-backend
     env: node
-    buildCommand: cd backend && npm install --production=false && npm run build
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
       - key: NODE_ENV
@@ -12,14 +13,14 @@ services:
         value: sqlite
       - key: JWT_SECRET
         generateValue: true
-      - key: PORT
-        value: 3000
       - key: ALLOWED_ORIGINS
         value: "*"
 
-# Frontend Static Site
-staticSites:
-  - name: aescion-frontend
+  # Frontend Static Site
+  - type: web
+    name: aescion-frontend
+    runtime: static
+    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
@@ -29,6 +30,6 @@ staticSites:
     envVars:
       - key: VITE_API_URL
         fromService:
-          type: web
           name: aescion-backend
+          type: web
           property: url
