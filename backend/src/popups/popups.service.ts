@@ -47,7 +47,8 @@ export class PopupsService {
             const filePath = path.join(uploadDir, fileName);
             fs.writeFileSync(filePath, file.buffer);
 
-            publicUrl = `http://localhost:3000/uploads/${fileName}`;
+            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+            publicUrl = `${baseUrl}/uploads/${fileName}`;
         } else {
             // Upload to S3
             await this.s3Client.send(new PutObjectCommand({
