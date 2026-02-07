@@ -17,7 +17,7 @@ services:
         value: "*"
 
 # Frontend Static Site (Must be at the root level, not inside 'services')
-staticSites:
+staticsites:
   - name: aescion-frontend
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
