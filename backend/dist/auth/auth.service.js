@@ -89,7 +89,8 @@ let AuthService = class AuthService {
         user.resetPasswordToken = token;
         user.resetPasswordExpires = new Date(Date.now() + 3600000);
         await this.usersService.save(user);
-        const resetLink = `http://localhost:5173/admin/reset-password?token=${token}`;
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const resetLink = `${frontendUrl}/admin/reset-password?token=${token}`;
         console.log(`Generated reset link: ${resetLink}`);
         try {
             await this.transporter.sendMail({
