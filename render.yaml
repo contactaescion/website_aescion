@@ -16,11 +16,9 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
 
-  # Frontend Static Site
-  - type: web
-    name: aescion-frontend
-    runtime: static
-    plan: free
+# Frontend Static Site
+staticSites:
+  - name: aescion-frontend
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
@@ -29,8 +27,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://
         fromService:
-          name: aescion-backend
           type: web
+          name: aescion-backend
           property: hostport
