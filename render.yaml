@@ -29,7 +29,8 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
+        value: https://
         fromService:
           name: aescion-backend
           type: web
-          property: url
+          property: hostport
