@@ -24,16 +24,27 @@ import { MailModule } from './mail/mail.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_DATABASE'),
-        entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
-      }),
+      useFactory: (config: ConfigService) => {
+        const isSqlite = config.get<string>('DB_TYPE') === 'sqlite';
+        if (isSqlite) {
+          return {
+            type: 'better-sqlite3',
+            database: 'aescion.sqlite',
+            entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
+            synchronize: true, // Always sync for dev/test
+          };
+        }
+        return {
+          type: 'mysql',
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          username: config.get<string>('DB_USERNAME'),
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_DATABASE'),
+          entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
+          synchronize: config.get<string>('NODE_ENV') !== 'production',
+        };
+      },
     }),
     AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule
   ],
