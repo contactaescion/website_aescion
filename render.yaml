@@ -17,10 +17,9 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
 
-  # Frontend Static Site
-  - type: static
-    name: aescion-frontend
-    env: static
+# Frontend Static Site
+staticSites:
+  - name: aescion-frontend
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
