@@ -36,16 +36,27 @@ exports.AppModule = AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 inject: [config_1.ConfigService],
-                useFactory: (config) => ({
-                    type: 'mysql',
-                    host: config.get('DB_HOST'),
-                    port: config.get('DB_PORT'),
-                    username: config.get('DB_USERNAME'),
-                    password: config.get('DB_PASSWORD'),
-                    database: config.get('DB_DATABASE'),
-                    entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup],
-                    synchronize: config.get('NODE_ENV') !== 'production',
-                }),
+                useFactory: (config) => {
+                    const isSqlite = config.get('DB_TYPE') === 'sqlite';
+                    if (isSqlite) {
+                        return {
+                            type: 'better-sqlite3',
+                            database: 'aescion.sqlite',
+                            entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup],
+                            synchronize: true,
+                        };
+                    }
+                    return {
+                        type: 'mysql',
+                        host: config.get('DB_HOST'),
+                        port: config.get('DB_PORT'),
+                        username: config.get('DB_USERNAME'),
+                        password: config.get('DB_PASSWORD'),
+                        database: config.get('DB_DATABASE'),
+                        entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup],
+                        synchronize: config.get('NODE_ENV') !== 'production',
+                    };
+                },
             }),
             auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule
         ],
