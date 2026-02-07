@@ -3,7 +3,6 @@ services:
   - type: web
     name: aescion-backend
     env: node
-    plan: free
     buildCommand: cd backend && npm install && npm run build
     startCommand: cd backend && npm run start:prod
     envVars:
@@ -16,11 +15,10 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
 
-  # Frontend Static Site (YES, still type: web)
+  # Frontend Static Site
   - type: web
     name: aescion-frontend
     runtime: static
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     routes:
