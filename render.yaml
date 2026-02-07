@@ -1,5 +1,5 @@
 services:
-  # Backend Service (Remains here)
+  # Backend Service
   - type: web
     name: aescion-backend
     env: node
@@ -16,7 +16,7 @@ services:
       - key: ALLOWED_ORIGINS
         value: "*"
 
-# New top-level section for the frontend
+# Frontend Static Site (Must be at the root level, not inside 'services')
 staticSites:
   - name: aescion-frontend
     buildCommand: cd frontend && npm install && npm run build
