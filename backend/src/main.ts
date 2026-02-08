@@ -13,6 +13,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
+  // Increase body limit for large images
+  app.useBodyParser('json', { limit: '50mb' });
+  app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
+
   // Security Headers
   app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin for images
