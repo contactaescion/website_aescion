@@ -47,22 +47,16 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
-const nodemailer = __importStar(require("nodemailer"));
 const crypto_1 = require("crypto");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    transporter;
-    constructor(usersService, jwtService) {
+    mailService;
+    constructor(usersService, jwtService, mailService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS,
-            },
-        });
+        this.mailService = mailService;
     }
     async validateUser(email, pass) {
         const user = await this.usersService.findOneByEmail(email);
@@ -93,18 +87,7 @@ let AuthService = class AuthService {
         const resetLink = `${frontendUrl}/admin/reset-password?token=${token}`;
         console.log(`Generated reset link: ${resetLink}`);
         try {
-            await this.transporter.sendMail({
-                from: '"AESCION Admin" <contact.aescion@gmail.com>',
-                to: user.email,
-                subject: 'Password Reset Request',
-                html: `
-                    <p>You requested a password reset</p>
-                    <p>Click this link to reset your password:</p>
-                    <a href="${resetLink}">${resetLink}</a>
-                    <p>This link expires in 1 hour.</p>
-                `,
-            });
-            console.log(`Reset email sent successfully to ${email}`);
+            await this.mailService.sendPasswordResetEmail(user.email, resetLink);
         }
         catch (error) {
             console.error('Email send failed', error);
@@ -128,6 +111,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -102,6 +102,27 @@ export class GalleryService {
             } catch (e) {
                 console.error('S3 Delete Error', e);
             }
+        } else {
+            // Handle local file deletion
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                // Construct the file path from the public_url or s3_key
+                // Since we stored s3_key as the filename in mock mode (mostly), let's try to infer
+                // But s3_key might be 'local-seed-...' which doesn't correspond to a file in uploads
+                // If it's a seed image, we might skip deleting the file or check if it exists in uploads.
+
+                // If public_url contains 'uploads/', it is likely a locally uploaded file
+                if (image.public_url.includes('/uploads/')) {
+                    const fileName = image.public_url.split('/uploads/')[1];
+                    const filePath = path.join(process.cwd(), 'uploads', fileName);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            } catch (e) {
+                console.error('Local File Delete Error', e);
+            }
         }
 
         return this.galleryRepository.remove(image);

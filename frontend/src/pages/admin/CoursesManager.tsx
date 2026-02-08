@@ -39,9 +39,10 @@ export function CoursesManager() {
             try {
                 await coursesApi.delete(id);
                 fetchCourses();
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to delete course', error);
-                alert('Failed to delete course');
+                const msg = error.response?.data?.message || error.message || 'Failed to delete course';
+                alert(`Failed to delete course: ${msg}`);
             }
         }
     };

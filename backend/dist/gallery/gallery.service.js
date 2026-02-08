@@ -103,6 +103,22 @@ let GalleryService = class GalleryService {
                 console.error('S3 Delete Error', e);
             }
         }
+        else {
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                if (image.public_url.includes('/uploads/')) {
+                    const fileName = image.public_url.split('/uploads/')[1];
+                    const filePath = path.join(process.cwd(), 'uploads', fileName);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            }
+            catch (e) {
+                console.error('Local File Delete Error', e);
+            }
+        }
         return this.galleryRepository.remove(image);
     }
     async update(id, updateDto) {

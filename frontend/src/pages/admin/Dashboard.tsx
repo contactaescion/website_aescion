@@ -2,28 +2,41 @@ import { useEffect, useState } from 'react';
 import { Card } from '../../components/ui-kit/Card';
 import { courses as coursesApi } from '../../api/courses';
 import { enquiries as enquiriesApi } from '../../api/enquiries';
-import { BookOpen, Users, MessageSquare } from 'lucide-react';
+import { gallery as galleryApi } from '../../api/gallery';
+import { popups as popupsApi } from '../../api/popups';
+import { BookOpen, Users, MessageSquare, Image, Bell } from 'lucide-react';
 
 export function Dashboard() {
     const [stats, setStats] = useState({
         totalCourses: 0,
         totalEnquiries: 0,
-        newEnquiries: 0
+        newEnquiries: 0,
+        totalImages: 0,
+        activePopups: 0
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [coursesData, enquiriesData] = await Promise.all([
-                    coursesApi.getAll(),
-                    enquiriesApi.getAll()
+                // We use Promise.allSettled to ensure failure in one doesn't break others,
+                // but for simplicity/consistency with previous code we can use Promise.all
+                // or handle errors individually. 
+                // Let's use Promise.all and wrap in try-catch which is already there.
+                // Note: If endpoints don't exist yet, this might fail.
+                const [coursesData, enquiriesData, galleryData, popupsData] = await Promise.all([
+                    coursesApi.getAll().catch(() => []),
+                    enquiriesApi.getAll().catch(() => []),
+                    galleryApi.getAll().catch(() => []),
+                    popupsApi.getAll().catch(() => [])
                 ]);
 
                 setStats({
                     totalCourses: coursesData.length,
                     totalEnquiries: enquiriesData.length,
-                    newEnquiries: enquiriesData.filter(e => e.status === 'NEW').length
+                    newEnquiries: enquiriesData.filter((e: any) => e.status === 'NEW').length,
+                    totalImages: galleryData.length,
+                    activePopups: popupsData.filter((p: any) => p.is_active).length
                 });
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
@@ -69,6 +82,18 @@ export function Dashboard() {
                     value={stats.newEnquiries}
                     icon={MessageSquare}
                     color="bg-orange-500"
+                />
+                <StatCard
+                    title="Gallery Images"
+                    value={stats.totalImages}
+                    icon={Image}
+                    color="bg-pink-500"
+                />
+                <StatCard
+                    title="Active Popups"
+                    value={stats.activePopups}
+                    icon={Bell}
+                    color="bg-indigo-500"
                 />
             </div>
         </div>

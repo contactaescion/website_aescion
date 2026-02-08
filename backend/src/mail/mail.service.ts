@@ -66,4 +66,27 @@ export class MailService {
       return false;
     }
   }
+
+  async sendPasswordResetEmail(email: string, resetLink: string): Promise<boolean> {
+    const mailOptions = {
+      from: `"AESCION Admin" <${this.configService.get<string>('MAIL_USER')}>`,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+          <p>You requested a password reset</p>
+          <p>Click this link to reset your password:</p>
+          <a href="${resetLink}">${resetLink}</a>
+          <p>This link expires in 1 hour.</p>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      this.logger.log(`Reset email sent successfully to ${email}`);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to send reset email to ${email}. Error: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
 }
