@@ -61,7 +61,8 @@ let GalleryService = class GalleryService {
             const fileName = `${(0, uuid_1.v4)()}-${file.originalname}`;
             const filePath = path.join(uploadDir, fileName);
             fs.writeFileSync(filePath, file.buffer);
-            publicUrl = `http://localhost:3000/uploads/${fileName}`;
+            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+            publicUrl = `${baseUrl}/uploads/${fileName}`;
         }
         else {
             await this.s3Client.send(new client_s3_1.PutObjectCommand({

@@ -13,6 +13,8 @@ const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
+    app.useBodyParser('json', { limit: '50mb' });
+    app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: "cross-origin" },
     }));
