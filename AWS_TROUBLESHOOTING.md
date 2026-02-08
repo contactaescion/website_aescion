@@ -1,74 +1,44 @@
 # Troubleshooting AWS Upload Issues
 
-It looks like the file upload is failing. This is usually caused by one of three things:
+## 0. CRITICAL: Run Commands on Server!
+You must be connected to your AWS server to run these commands.
+Your terminal prompt should look like: `ubuntu@ip-172-xx-xx-xx:~/backend$`
+**NOT** like: `PS C:\Users\tskar\...`
 
-## 1. CORS Error (Most Likely)
-Your backend (EC2) might be rejecting requests from your new S3 domain.
-
-**Fix:**
-1.  SSH into your EC2 instance.
-2.  Edit your `.env` file:
-    ```bash
-    nano ~/aescion/backend/.env
-    ```
-3.  Update `ALLOWED_ORIGINS` to include your exact frontend URL (from the screenshot):
-    ```env
-    ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://aescion-website-prod.s3-website.eu-north-1.amazonaws.com
-    ```
-    *(Note: Ensure there are no spaces between commas)*
-4.  Restart the backend:
-    ```bash
-    pm2 restart api
-    ```
-
-## 2. Nginx File Size Limit
-By default, Nginx limits uploads to 1MB. High-quality images usually exceed this.
-
-**Fix:**
-1.  Edit Nginx config on EC2:
-    ```bash
-    sudo nano /etc/nginx/sites-available/default
-    ```
-2.  Add `client_max_body_size 10M;` inside the `server` block (or `location /` block):
-    ```nginx
-    server {
-        listen 80;
-        server_name ...;
-        
-        client_max_body_size 10M;  # <--- ADD THIS LINE
-
-        location / {
-            ...
-        }
-    }
-    ```
-3.  Restart Nginx:
-    ```bash
-    sudo systemctl restart nginx
-    ```
-
-## 3. S3 Bucket Policy (CORS)
-The S3 bucket itself might need to allow cross-origin requests if you are accessing it directly (though your backend handles the upload, so this is less likely, but good to check).
-
-**Fix:**
-1.  Go to AWS Console -> **S3** -> **aescion-gallery-prod**.
-2.  **Permissions** tab -> **Cross-origin resource sharing (CORS)**.
-3.  Ensure it looks like this:
-    ```json
-    [
-        {
-            "AllowedHeaders": ["*"],
-            "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
-            "AllowedOrigins": ["*"],
-            "ExposeHeaders": []
-        }
-    ]
-    ```
-
-## 4. Check Backend Logs
-If it still fails, check the backend logs to see the specific error:
+## 1. Restart Services (After .env changes)
+If you changed `.env` or Nginx config, you **MUST** restart for changes to apply:
 ```bash
-pm2 logs api
+# Restart Backend (Apply .env changes)
+pm2 restart api
+
+# Restart Nginx (Apply upload limit changes)
+sudo systemctl restart nginx
 ```
-- If you see `AccessDenied`, your AWS IAM keys in `.env` are wrong.
-- If you see `PayloadTooLarge`, it's the Nginx issue (Step 2).
+
+## 2. Check the Error Code (Browser)
+1.  On your website, right-click -> **Inspect**.
+2.  Go to the **Network** tab.
+3.  Try to upload the image again.
+4.  Look for the red line (the failed request) and check the **Status** column:
+
+*   **413 Payload Too Large**: Nginx is blocking the file size.
+    *   *Fix:* Edit `/etc/nginx/sites-available/default` and add `client_max_body_size 10M;`.
+*   **403 Forbidden / 401 Unauthorized**: AWS Keys are wrong or Bucket Name is wrong.
+    *   *Fix:* Check `AWS_ACCESS_KEY_ID` and `AWS_S3_BUCKET` in `.env`.
+*   **500 Internal Server Error**: Backend crashed or syntax error in code.
+    *   *Fix:* Run `pm2 logs api` to see the crash error.
+*   **CORS Error ( Console Tab )**: "Blocked by CORS policy".
+    *   *Fix:* Check `ALLOWED_ORIGINS` in `.env`.
+
+## 3. Verify .env File
+Ensure there are no spaces around the `=` sign and no duplicate keys.
+```bash
+cat .env
+```
+
+## 4. View Backend Logs
+To see exactly why the server is rejecting the file:
+```bash
+pm2 logs api --lines 50
+```
+*Look for "Error" or "Exception" messages.*
