@@ -22,4 +22,16 @@ export class CreateEnquiryDto {
     @IsNotEmpty()
     @MinLength(10)
     message: string;
+
+    @IsString()
+    @IsOptional()
+    type?: string;
+
+    @IsString()
+    @IsOptional()
+    source?: string;
+
+    @IsString()
+    @IsOptional()
+    session_id?: string;
 }

@@ -60,7 +60,11 @@ let AuthService = class AuthService {
     }
     async validateUser(email, pass) {
         const user = await this.usersService.findOneByEmail(email);
-        if (user && user.password && (await bcrypt.compare(pass, user.password))) {
+        if (!user || !user.password) {
+            return null;
+        }
+        const isMatch = await bcrypt.compare(pass, user.password);
+        if (isMatch) {
             const { password, ...result } = user;
             return result;
         }
@@ -70,6 +74,12 @@ let AuthService = class AuthService {
         const payload = { username: user.email, sub: user.id, role: user.role };
         return {
             access_token: this.jwtService.sign(payload),
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+            },
         };
     }
     async forgotPassword(email) {

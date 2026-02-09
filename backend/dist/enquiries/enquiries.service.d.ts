@@ -9,4 +9,6 @@ export declare class EnquiriesService {
     create(dto: CreateEnquiryDto): Promise<Enquiry>;
     findAll(): Promise<Enquiry[]>;
     updateStatus(id: number, status: string): Promise<Enquiry | null>;
+    assign(id: number, assignedTo: number): Promise<Enquiry | null>;
+    addNote(id: number, note: string): Promise<Enquiry | null>;
 }

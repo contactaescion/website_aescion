@@ -50,7 +50,17 @@ export function Gallery() {
 
                 {/* Grid */}
                 {loading ? (
-                    <div className="text-center py-12 text-gray-500">Loading gallery...</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="aspect-video bg-gray-200 rounded-xl"></div>
+                                <div className="mt-3 px-1">
+                                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 ) : filteredImages.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">No images found in this category.</div>
                 ) : (

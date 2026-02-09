@@ -67,8 +67,9 @@ export class GalleryService {
                 Key: key,
                 Body: file.buffer,
                 ContentType: file.mimetype,
-                ACL: 'public-read',
+                // ACL: 'public-read', // REMOVED for Private Bucket
             }));
+            // We store the key, but public_url will be generated dynamically
             publicUrl = `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`;
         }
 
@@ -77,14 +78,16 @@ export class GalleryService {
             description,
             category,
             s3_key: key,
-            public_url: publicUrl,
+            public_url: publicUrl, // Stored for reference/mock, but overridden on fetch for S3
             thumb_url: publicUrl,
         });
-        return this.galleryRepository.save(image);
+        await this.galleryRepository.save(image);
+        return this.signImage(image);
     }
 
-    findAll() {
-        return this.galleryRepository.find({ order: { created_at: 'DESC' } });
+    async findAll() {
+        const images = await this.galleryRepository.find({ order: { created_at: 'DESC' } });
+        return Promise.all(images.map(img => this.signImage(img)));
     }
 
     async remove(id: number) {
@@ -103,16 +106,10 @@ export class GalleryService {
                 console.error('S3 Delete Error', e);
             }
         } else {
-            // Handle local file deletion
+            // ... existing mock delete logic ...
             try {
                 const fs = require('fs');
                 const path = require('path');
-                // Construct the file path from the public_url or s3_key
-                // Since we stored s3_key as the filename in mock mode (mostly), let's try to infer
-                // But s3_key might be 'local-seed-...' which doesn't correspond to a file in uploads
-                // If it's a seed image, we might skip deleting the file or check if it exists in uploads.
-
-                // If public_url contains 'uploads/', it is likely a locally uploaded file
                 if (image.public_url.includes('/uploads/')) {
                     const fileName = image.public_url.split('/uploads/')[1];
                     const filePath = path.join(process.cwd(), 'uploads', fileName);
@@ -130,13 +127,35 @@ export class GalleryService {
 
     async update(id: number, updateDto: Partial<GalleryImage>) {
         await this.galleryRepository.update(id, updateDto);
-        return this.galleryRepository.findOne({ where: { id } });
+        const image = await this.galleryRepository.findOne({ where: { id } });
+        return this.signImage(image!);
     }
 
     async search(query: string) {
-        return this.galleryRepository
+        const images = await this.galleryRepository
             .createQueryBuilder('gallery')
             .where('gallery.title LIKE :query OR gallery.description LIKE :query', { query: `%${query}%` })
             .getMany();
+        return Promise.all(images.map(img => this.signImage(img)));
+    }
+
+    // Helper to generate Signed URL
+    private async signImage(image: GalleryImage) {
+        if (this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key') {
+            return image;
+        }
+        try {
+            const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+            const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+
+            const command = new GetObjectCommand({ Bucket: this.bucketName, Key: image.s3_key });
+            const url = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+            image.public_url = url;
+            image.thumb_url = url;
+            return image;
+        } catch (e) {
+            console.error('Error signing URL for image:', image.id, e);
+            return image;
+        }
     }
 }

@@ -27,4 +27,18 @@ export class EnquiriesController {
     updateStatus(@Body() body: { status: string }, @Param('id') id: number) {
         return this.service.updateStatus(id, body.status);
     }
+
+    @Post(':id/assign')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
+    assign(@Body() body: { assigned_to: number }, @Param('id') id: number) {
+        return this.service.assign(id, body.assigned_to);
+    }
+
+    @Post(':id/notes')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
+    addNote(@Body() body: { note: string }, @Param('id') id: number) {
+        return this.service.addNote(id, body.note);
+    }
 }

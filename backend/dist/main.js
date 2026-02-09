@@ -20,9 +20,20 @@ async function bootstrap() {
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: "cross-origin" },
     }));
+    const authLimiter = (0, express_rate_limit_1.rateLimit)({
+        windowMs: 15 * 60 * 1000,
+        max: 5,
+        message: 'Too many attempts, please try again later.',
+        standardHeaders: true,
+        legacyHeaders: false,
+    });
+    app.use('/auth/login', authLimiter);
+    app.use('/auth/forgot-password', authLimiter);
     app.use((0, express_rate_limit_1.rateLimit)({
         windowMs: 15 * 60 * 1000,
         max: 100,
+        standardHeaders: true,
+        legacyHeaders: false,
     }));
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,

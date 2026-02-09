@@ -10,6 +10,7 @@ export declare class GalleryService {
     uploadFile(file: Express.Multer.File, title: string, description: string, category: GalleryCategory): Promise<GalleryImage>;
     findAll(): Promise<GalleryImage[]>;
     remove(id: number): Promise<GalleryImage>;
-    update(id: number, updateDto: Partial<GalleryImage>): Promise<GalleryImage | null>;
+    update(id: number, updateDto: Partial<GalleryImage>): Promise<GalleryImage>;
     search(query: string): Promise<GalleryImage[]>;
+    private signImage;
 }

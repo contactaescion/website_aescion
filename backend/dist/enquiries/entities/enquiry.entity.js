@@ -19,6 +19,11 @@ let Enquiry = class Enquiry {
     course_interest;
     message;
     status;
+    type;
+    source;
+    assigned_to;
+    notes;
+    session_id;
     created_at;
 };
 exports.Enquiry = Enquiry;
@@ -50,6 +55,26 @@ __decorate([
     (0, typeorm_1.Column)({ default: 'NEW' }),
     __metadata("design:type", String)
 ], Enquiry.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'TRAINING' }),
+    __metadata("design:type", String)
+], Enquiry.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Enquiry.prototype, "source", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], Enquiry.prototype, "assigned_to", void 0);
+__decorate([
+    (0, typeorm_1.Column)('simple-json', { nullable: true }),
+    __metadata("design:type", Array)
+], Enquiry.prototype, "notes", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Enquiry.prototype, "session_id", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

@@ -38,6 +38,21 @@ let EnquiriesService = class EnquiriesService {
     }
     async updateStatus(id, status) {
         await this.repo.update(id, { status });
+        const updated = await this.repo.findOne({ where: { id } });
+        return updated;
+    }
+    async assign(id, assignedTo) {
+        await this.repo.update(id, { assigned_to: assignedTo });
+        return this.repo.findOne({ where: { id } });
+    }
+    async addNote(id, note) {
+        const enquiry = await this.repo.findOne({ where: { id } });
+        if (!enquiry)
+            return null;
+        const notes = enquiry.notes || [];
+        const noteWithTimestamp = `[${new Date().toISOString()}] ${note}`;
+        notes.push(noteWithTimestamp);
+        await this.repo.update(id, { notes });
         return this.repo.findOne({ where: { id } });
     }
 };

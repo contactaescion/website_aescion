@@ -12,9 +12,23 @@ async function bootstrap() {
     const coursesService = app.get(CoursesService);
 
     console.log('Seeding Users...');
-    try {
-        const adminEmail = 'contact.aescion@gmail.com';
-        const adminPassword = 'AESCION@123'; // You should change this in production!
+    console.log('Seeding Users...');
+    const adminEmail = 'contact.aescion@gmail.com'; // official email
+    const adminPassword = 'AESCION@123';
+
+    // Check if admin exists
+    let adminUser = await usersService.findOneByEmail(adminEmail);
+
+    if (adminUser) {
+        console.log('Admin user exists, updating password...');
+        // Force update password
+        const hashedPassword = await import('bcrypt').then(m => m.hash(adminPassword, 10));
+        adminUser.password = hashedPassword;
+        adminUser.role = UserRole.SUPER_ADMIN;
+        await usersService.save(adminUser);
+        console.log('Admin password updated');
+    } else {
+        console.log('Creating Admin user...');
         await usersService.create({
             email: adminEmail,
             password: adminPassword,
@@ -22,8 +36,6 @@ async function bootstrap() {
             role: UserRole.SUPER_ADMIN,
         });
         console.log('Admin user created');
-    } catch (e) {
-        console.log('Admin user likely exists');
     }
 
     console.log('Seeding Courses...');

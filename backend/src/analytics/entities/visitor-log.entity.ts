@@ -20,6 +20,9 @@ export class VisitorLog {
     @Column({ nullable: true })
     method: string;
 
+    @Column({ nullable: true })
+    session_id: string;
+
     @CreateDateColumn()
     visited_at: Date;
 }

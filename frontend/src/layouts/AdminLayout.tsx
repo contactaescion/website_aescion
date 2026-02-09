@@ -9,13 +9,42 @@ export function AdminLayout() {
     // Auth is now handled by ProtectedRoute wrapper in App.tsx
 
 
-    const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
-        { icon: BookOpen, label: 'Courses', href: '/admin/courses' },
-        { icon: Image, label: 'Gallery', href: '/admin/gallery' },
-        { icon: Users, label: 'Enquiries', href: '/admin/enquiries' },
-        { icon: LayoutDashboard, label: 'Popups', href: '/admin/popups' },
+    const userRole = sessionStorage.getItem('user_role');
+
+    const navigation = [
+        {
+            category: 'Overview',
+            items: [
+                { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard', roles: ['SUPER_ADMIN', 'STAFF', 'HR', 'TRAINER'] },
+                { icon: LayoutDashboard, label: 'Analytics', href: '/admin/dashboard', roles: ['SUPER_ADMIN'] }, // Placeholder
+            ]
+        },
+        {
+            category: 'Training',
+            items: [
+                { icon: BookOpen, label: 'Courses', href: '/admin/courses', roles: ['SUPER_ADMIN', 'STAFF'] },
+                { icon: Image, label: 'Gallery', href: '/admin/gallery', roles: ['SUPER_ADMIN', 'STAFF'] },
+                { icon: Users, label: 'Training Enquiries', href: '/admin/enquiries?type=TRAINING', roles: ['SUPER_ADMIN', 'STAFF'] },
+                { icon: LayoutDashboard, label: 'Popups', href: '/admin/popups', roles: ['SUPER_ADMIN', 'STAFF'] },
+            ]
+        },
+        {
+            category: 'Recruitment',
+            items: [
+                { icon: Users, label: 'Employer Enquiries', href: '/admin/enquiries?type=HR', roles: ['SUPER_ADMIN', 'HR'] },
+                // { icon: FileText, label: 'Job Requests', href: '/admin/jobs', roles: ['SUPER_ADMIN', 'HR'] }, // Placeholder
+            ]
+        },
+        {
+            category: 'System',
+            items: [
+                { icon: Users, label: 'Settings', href: '/admin/profile', roles: ['SUPER_ADMIN'] },
+            ]
+        }
     ];
+
+    // Helper to check role access
+    const hasAccess = (roles?: string[]) => !roles || roles.includes(userRole || '');
 
     const handleLogout = () => {
         if (confirm('Are you sure you want to logout?')) {
@@ -31,16 +60,25 @@ export function AdminLayout() {
                 <div className="h-16 flex items-center justify-center border-b border-gray-100">
                     <img src="/assets/logo.svg" alt="AESCION Logo" className="h-26 md:h-50 w-auto" />
                 </div>
-                <nav className="p-4 space-y-2">
-                    {navItems.map((item) => (
-                        <a
-                            key={item.label}
-                            href={item.href}
-                            className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-blue-50 hover:text-brand-blue rounded-lg transition-colors"
-                        >
-                            <item.icon className="w-5 h-5 shrink-0" />
-                            <span className={`${!isSidebarOpen && 'lg:hidden lg:group-hover:block'} whitespace-nowrap`}>{item.label}</span>
-                        </a>
+                <nav className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-4rem)]">
+                    {navigation.map((section, idx) => (
+                        <div key={idx}>
+                            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-4 lg:hidden lg:group-hover:block">
+                                {section.category}
+                            </div>
+                            <div className="space-y-1">
+                                {section.items.filter(item => hasAccess(item.roles)).map((item) => (
+                                    <a
+                                        key={item.label}
+                                        href={item.href}
+                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-brand-blue rounded-lg transition-colors"
+                                    >
+                                        <item.icon className="w-5 h-5 shrink-0" />
+                                        <span className={`${!isSidebarOpen && 'lg:hidden lg:group-hover:block'} whitespace-nowrap`}>{item.label}</span>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </nav>
             </aside>

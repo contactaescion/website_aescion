@@ -5,8 +5,10 @@ import { AnalyticsController } from './analytics.controller';
 import { VisitorLog } from './entities/visitor-log.entity';
 import { AnalyticsMiddleware } from './analytics.middleware';
 
+import { Enquiry } from '../enquiries/entities/enquiry.entity';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([VisitorLog])],
+  imports: [TypeOrmModule.forFeature([VisitorLog, Enquiry])],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],
   exports: [AnalyticsService],

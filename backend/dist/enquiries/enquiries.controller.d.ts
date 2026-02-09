@@ -7,4 +7,10 @@ export declare class EnquiriesController {
     updateStatus(body: {
         status: string;
     }, id: number): Promise<import("./entities/enquiry.entity").Enquiry | null>;
+    assign(body: {
+        assigned_to: number;
+    }, id: number): Promise<import("./entities/enquiry.entity").Enquiry | null>;
+    addNote(body: {
+        note: string;
+    }, id: number): Promise<import("./entities/enquiry.entity").Enquiry | null>;
 }

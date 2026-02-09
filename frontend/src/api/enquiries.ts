@@ -8,7 +8,12 @@ export interface Enquiry {
     course_interest: string;
     message: string;
     created_at: string;
-    status: 'NEW' | 'CONTACTED' | 'CLOSED';
+    status: 'NEW' | 'CONTACTED' | 'CLOSED' | 'FOLLOW_UP' | 'CONVERTED';
+    type?: 'TRAINING' | 'HR';
+    source?: string;
+    assigned_to?: number;
+    notes?: string[];
+    session_id?: string;
 }
 
 export const enquiries = {
@@ -22,6 +27,14 @@ export const enquiries = {
     },
     updateStatus: async (id: number, status: string) => {
         const response = await client.post(`/enquiries/${id}/status`, { status });
+        return response.data;
+    },
+    assign: async (id: number, assigned_to: number) => {
+        const response = await client.post(`/enquiries/${id}/assign`, { assigned_to });
+        return response.data;
+    },
+    addNote: async (id: number, note: string) => {
+        const response = await client.post(`/enquiries/${id}/notes`, { note });
         return response.data;
     }
 };

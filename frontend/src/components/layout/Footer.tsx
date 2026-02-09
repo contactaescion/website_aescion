@@ -1,6 +1,10 @@
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
-export function Footer() {
+interface FooterProps {
+    hideCourses?: boolean;
+}
+
+export function Footer({ hideCourses }: FooterProps) {
     const currentYear = new Date().getFullYear();
 
     return (
@@ -44,16 +48,18 @@ export function Footer() {
                     </div>
 
                     {/* Courses */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-6 text-brand-orange">Top Courses</h3>
-                        <ul className="space-y-3">
-                            {['Java Full Stack', 'Python Full Stack', 'MERN Stack', 'Embedded Systems', 'IoT', 'Data Analyst'].map((item) => (
-                                <li key={item} className="text-gray-300 text-sm">
-                                    {item}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {!hideCourses && (
+                        <div>
+                            <h3 className="text-lg font-semibold mb-6 text-brand-orange">Top Courses</h3>
+                            <ul className="space-y-3">
+                                {['Java Full Stack', 'Python Full Stack', 'MERN Stack', 'Embedded Systems', 'IoT', 'Data Analyst'].map((item) => (
+                                    <li key={item} className="text-gray-300 text-sm">
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* Contact Info */}
                     <div>

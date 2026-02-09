@@ -26,9 +26,9 @@ export function Courses() {
         fetchCourses();
     }, []);
 
-    const filteredCourses = courses.filter(c =>
-        c.title.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredCourses = courses
+        .filter(c => !c.is_featured) // Exclude featured courses to avoid duplicates
+        .filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
     if (loading) {
         return <div className="py-20 text-center text-gray-500">Loading courses...</div>;
@@ -57,46 +57,52 @@ export function Courses() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredCourses.map((course) => (
-                        <motion.div
-                            key={course.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                            viewport={{ once: true }}
-                        >
-                            <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
-                                <div className="mb-4">
-                                    <div className="bg-brand-blue/10 w-12 h-12 rounded-lg flex items-center justify-center text-brand-blue mb-4">
-                                        <BookOpen className="w-6 h-6" />
+                {filteredCourses.length === 0 ? (
+                    <div className="text-center py-10">
+                        <p className="text-gray-500 text-lg">No courses found matching your criteria. Please check back later.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredCourses.map((course) => (
+                            <motion.div
+                                key={course.id}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                viewport={{ once: true }}
+                            >
+                                <Card className="h-full flex flex-col p-6 hover:shadow-lg transition-shadow">
+                                    <div className="mb-4">
+                                        <div className="bg-brand-blue/10 w-12 h-12 rounded-lg flex items-center justify-center text-brand-blue mb-4">
+                                            <BookOpen className="w-6 h-6" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900">{course.title}</h3>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900">{course.title}</h3>
-                                </div>
 
-                                <div className="space-y-3 mb-6 flex-grow">
-                                    <div className="flex items-center text-sm text-gray-500">
-                                        <Clock className="w-4 h-4 mr-2" />
-                                        {course.duration}
+                                    <div className="space-y-3 mb-6 flex-grow">
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <Clock className="w-4 h-4 mr-2" />
+                                            {course.duration}
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <Users className="w-4 h-4 mr-2" />
+                                            {course.mode}
+                                        </div>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-500">
-                                        <Users className="w-4 h-4 mr-2" />
-                                        {course.mode}
-                                    </div>
-                                </div>
 
-                                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                                    <div className="text-brand-orange font-bold text-lg">{course.fees}</div>
-                                    <a href="#contact">
-                                        <Button size="sm" variant="outline">
-                                            Enquire
-                                        </Button>
-                                    </a>
-                                </div>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </div>
+                                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                                        <div className="text-brand-orange font-bold text-lg">{course.fees}</div>
+                                        <a href="#contact">
+                                            <Button size="sm" variant="outline">
+                                                Enquire
+                                            </Button>
+                                        </a>
+                                    </div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );

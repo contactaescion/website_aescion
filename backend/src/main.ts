@@ -28,11 +28,24 @@ async function bootstrap() {
     crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin for images
   }));
 
-  // Rate Limiting
+  // Specific Rate Limiting for Auth
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 requests per windowMs
+    message: 'Too many attempts, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use('/auth/login', authLimiter);
+  app.use('/auth/forgot-password', authLimiter);
+
+  // Global Rate Limiting
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100, // limit each IP to 100 requests per windowMs
+      standardHeaders: true,
+      legacyHeaders: false,
     }),
   );
 

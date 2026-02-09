@@ -14,11 +14,14 @@ export class UsersService {
     async create(createUserDto: Partial<User>): Promise<User> {
         const existingUser = await this.usersRepository.findOne({ where: { email: createUserDto.email } });
         if (existingUser) {
+            // Instead of throwing error, we can return the existing user or throw a specific error
+            // For seed script, we handle existence check there. For API, duplicate email should be error.
             throw new Error('User already exists');
         }
 
         const passwordRaw = createUserDto.password || 'default123';
         const hashedPassword = await bcrypt.hash(passwordRaw, 10);
+
         const user = this.usersRepository.create({
             ...createUserDto,
             password: hashedPassword,

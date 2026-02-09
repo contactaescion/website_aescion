@@ -22,7 +22,22 @@ export class Enquiry {
     message: string;
 
     @Column({ default: 'NEW' })
-    status: string;
+    status: string; // NEW, CONTACTED, FOLLOW_UP, CONVERTED, CLOSED
+
+    @Column({ default: 'TRAINING' })
+    type: string; // TRAINING, HR
+
+    @Column({ nullable: true })
+    source: string; // search, course_page, etc.
+
+    @Column({ nullable: true })
+    assigned_to: number; // User ID of staff
+
+    @Column('simple-json', { nullable: true })
+    notes: string[]; // Internal notes
+
+    @Column({ nullable: true })
+    session_id: string;
 
     @CreateDateColumn()
     created_at: Date;

@@ -56,4 +56,18 @@ export class AnalyticsController {
     getTopPages() {
         return this.analyticsService.getTopPages();
     }
+
+    @Get('conversions')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
+    getConversions() {
+        return this.analyticsService.getConversionStats();
+    }
+
+    @Get('sources')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
+    getEnquiriesBySource() {
+        return this.analyticsService.getEnquiriesBySource();
+    }
 }

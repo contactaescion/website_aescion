@@ -1,97 +1,132 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Card } from '../../components/ui-kit/Card';
-import { Input } from '../../components/ui-kit/Input';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { auth } from '../../api/auth';
 import { Button } from '../../components/ui-kit/Button';
-import { client } from '../../api/client';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Input } from '../../components/ui-kit/Input';
+import { CheckCircle } from 'lucide-react';
+import { Card } from '../../components/ui-kit/Card';
+
+interface ResetPasswordFormData {
+    password: string;
+    confirmPassword: string;
+}
 
 export function ResetPassword() {
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const navigate = useNavigate();
-    const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<{ newPassword: string; confirmPassword: string }>();
-    const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-    if (!token) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-                <Card className="max-w-md w-full p-8 text-center">
-                    <h2 className="text-xl font-bold text-red-600 mb-2">Invalid Request</h2>
-                    <p className="text-gray-600 mb-6">No reset token provided.</p>
-                    <Link to="/admin/login" className="text-brand-blue hover:underline">Return to Login</Link>
-                </Card>
-            </div>
-        );
-    }
+    const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<ResetPasswordFormData>();
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const onSubmit = async (data: { newPassword: string }) => {
+    const onSubmit = async (data: ResetPasswordFormData) => {
+        setSuccessMessage(null);
+        setErrorMessage(null);
+
+        if (!token) {
+            setErrorMessage('Invalid or missing reset token.');
+            return;
+        }
+
         try {
-            await client.post('auth/reset-password', { token, newPassword: data.newPassword });
-            setStatus('success');
-            setTimeout(() => navigate('/admin/login'), 3000);
-        } catch (error) {
-            console.error('Reset failed', error);
-            setStatus('error');
+            await auth.resetPassword(token, data.password);
+            setSuccessMessage('Password reset successfully! Redirecting to login...');
+            setTimeout(() => {
+                navigate('/admin/login');
+            }, 3000);
+        } catch (error: any) {
+            console.error('Reset password error', error);
+            setErrorMessage(error.response?.data?.message || 'Failed to reset password. The link may have expired.');
         }
     };
 
-    if (status === 'success') {
+    if (!token) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-                <Card className="max-w-md w-full p-8 text-center">
-                    <h2 className="text-2xl font-bold mb-4 text-green-600">Password Reset</h2>
-                    <p className="text-gray-600 mb-6">Your password has been reset successfully.</p>
-                    <p className="text-sm text-gray-500">Redirecting to login...</p>
-                </Card>
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                    <Card className="p-6 text-center">
+                        <h3 className="text-lg font-medium text-red-600 mb-2">Invalid Link</h3>
+                        <p className="text-gray-600 mb-4">This password reset link is invalid or missing.</p>
+                        <Link to="/admin/login" className="text-brand-blue hover:underline">Return to Login</Link>
+                    </Card>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-            <Card className="max-w-md w-full p-8">
-                <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
-                <p className="text-gray-600 mb-6">Enter your new password below.</p>
+        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Set new password
+                </h2>
+            </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <Input
-                        label="New Password"
-                        type="password"
-                        placeholder="********"
-                        {...register('newPassword', {
-                            required: 'Password is required',
-                            minLength: { value: 6, message: 'Must be at least 6 characters' }
-                        })}
-                        error={errors.newPassword?.message}
-                    />
-
-                    <Input
-                        label="Confirm Password"
-                        type="password"
-                        placeholder="********"
-                        {...register('confirmPassword', {
-                            required: 'Please confirm your password',
-                            validate: (val) => {
-                                if (watch('newPassword') != val) {
-                                    return "Your passwords do not match";
-                                }
-                            }
-                        })}
-                        error={errors.confirmPassword?.message}
-                    />
-
-                    {status === 'error' && (
-                        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
-                            Failed to reset password. The link may have expired.
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <Card className="py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                    {successMessage ? (
+                        <div className="rounded-md bg-green-50 p-4">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <CheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />
+                                </div>
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-green-800">Success</h3>
+                                    <div className="mt-2 text-sm text-green-700">
+                                        <p>{successMessage}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    )}
+                    ) : (
+                        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                            {errorMessage && (
+                                <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+                                    {errorMessage}
+                                </div>
+                            )}
 
-                    <Button type="submit" fullWidth disabled={isSubmitting}>
-                        {isSubmitting ? 'Resetting...' : 'Reset Password'}
-                    </Button>
-                </form>
-            </Card>
+                            <Input
+                                label="New Password"
+                                type="password"
+                                {...register('password', {
+                                    required: 'Password is required',
+                                    minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                                })}
+                                error={errors.password?.message}
+                                placeholder="••••••••"
+                            />
+
+                            <Input
+                                label="Confirm Password"
+                                type="password"
+                                {...register('confirmPassword', {
+                                    required: 'Please confirm your password',
+                                    validate: (val: string) => {
+                                        if (watch('password') != val) {
+                                            return "Your passwords do not match";
+                                        }
+                                    }
+                                })}
+                                error={errors.confirmPassword?.message}
+                                placeholder="••••••••"
+                            />
+
+                            <div>
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                                </Button>
+                            </div>
+                        </form>
+                    )}
+                </Card>
+            </div>
         </div>
     );
 }

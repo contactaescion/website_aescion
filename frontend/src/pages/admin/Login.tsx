@@ -16,6 +16,12 @@ export function Login() {
             setError('');
             const result = await auth.login(data.email, data.password);
             sessionStorage.setItem('access_token', result.access_token);
+
+            // Fetch profile to get role
+            const profile = await auth.getProfile();
+            sessionStorage.setItem('user_role', profile.role);
+            sessionStorage.setItem('user_name', profile.name);
+
             navigate('/admin/dashboard');
         } catch (err: any) {
             console.error('Login failed', err);

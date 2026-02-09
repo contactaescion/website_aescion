@@ -70,7 +70,6 @@ let GalleryService = class GalleryService {
                 Key: key,
                 Body: file.buffer,
                 ContentType: file.mimetype,
-                ACL: 'public-read',
             }));
             publicUrl = `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${key}`;
         }
@@ -82,10 +81,12 @@ let GalleryService = class GalleryService {
             public_url: publicUrl,
             thumb_url: publicUrl,
         });
-        return this.galleryRepository.save(image);
+        await this.galleryRepository.save(image);
+        return this.signImage(image);
     }
-    findAll() {
-        return this.galleryRepository.find({ order: { created_at: 'DESC' } });
+    async findAll() {
+        const images = await this.galleryRepository.find({ order: { created_at: 'DESC' } });
+        return Promise.all(images.map(img => this.signImage(img)));
     }
     async remove(id) {
         const image = await this.galleryRepository.findOne({ where: { id } });
@@ -123,13 +124,33 @@ let GalleryService = class GalleryService {
     }
     async update(id, updateDto) {
         await this.galleryRepository.update(id, updateDto);
-        return this.galleryRepository.findOne({ where: { id } });
+        const image = await this.galleryRepository.findOne({ where: { id } });
+        return this.signImage(image);
     }
     async search(query) {
-        return this.galleryRepository
+        const images = await this.galleryRepository
             .createQueryBuilder('gallery')
             .where('gallery.title LIKE :query OR gallery.description LIKE :query', { query: `%${query}%` })
             .getMany();
+        return Promise.all(images.map(img => this.signImage(img)));
+    }
+    async signImage(image) {
+        if (this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key') {
+            return image;
+        }
+        try {
+            const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+            const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+            const command = new GetObjectCommand({ Bucket: this.bucketName, Key: image.s3_key });
+            const url = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+            image.public_url = url;
+            image.thumb_url = url;
+            return image;
+        }
+        catch (e) {
+            console.error('Error signing URL for image:', image.id, e);
+            return image;
+        }
     }
 };
 exports.GalleryService = GalleryService;

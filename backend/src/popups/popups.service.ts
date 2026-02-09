@@ -109,6 +109,20 @@ export class PopupsService {
             } catch (e) {
                 console.error('S3 Delete Error', e);
             }
+        } else {
+            // Handle local file deletion
+            try {
+                if (popup.image_url && popup.image_url.includes('/uploads/')) {
+                    const fileName = popup.image_url.split('/uploads/')[1];
+                    const uploadDir = path.join(process.cwd(), 'uploads');
+                    const filePath = path.join(uploadDir, fileName);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            } catch (e) {
+                console.error('Local File Delete Error', e);
+            }
         }
 
         return this.popupsRepository.remove(popup);

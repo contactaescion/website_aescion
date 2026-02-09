@@ -32,6 +32,23 @@ export class EnquiriesService {
 
     async updateStatus(id: number, status: string) {
         await this.repo.update(id, { status });
+        const updated = await this.repo.findOne({ where: { id } });
+        return updated;
+    }
+
+    async assign(id: number, assignedTo: number) {
+        await this.repo.update(id, { assigned_to: assignedTo });
+        return this.repo.findOne({ where: { id } });
+    }
+
+    async addNote(id: number, note: string) {
+        const enquiry = await this.repo.findOne({ where: { id } });
+        if (!enquiry) return null;
+        const notes = enquiry.notes || [];
+        // Add timestamp and user info ideally, but for now just string
+        const noteWithTimestamp = `[${new Date().toISOString()}] ${note}`;
+        notes.push(noteWithTimestamp);
+        await this.repo.update(id, { notes });
         return this.repo.findOne({ where: { id } });
     }
 }

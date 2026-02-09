@@ -44,6 +44,7 @@ export class AnalyticsMiddleware implements NestMiddleware {
             path: req.originalUrl,
             user_agent: (req.headers['user-agent'] as string) || '',
             method: req.method,
+            session_id: (req.headers['x-session-id'] as string) || undefined,
         });
 
         next();

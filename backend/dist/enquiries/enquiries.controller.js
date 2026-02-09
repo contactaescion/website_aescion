@@ -33,6 +33,12 @@ let EnquiriesController = class EnquiriesController {
     updateStatus(body, id) {
         return this.service.updateStatus(id, body.status);
     }
+    assign(body, id) {
+        return this.service.assign(id, body.assigned_to);
+    }
+    addNote(body, id) {
+        return this.service.addNote(id, body.note);
+    }
 };
 exports.EnquiriesController = EnquiriesController;
 __decorate([
@@ -60,6 +66,26 @@ __decorate([
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", void 0)
 ], EnquiriesController.prototype, "updateStatus", null);
+__decorate([
+    (0, common_1.Post)(':id/assign'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.STAFF),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", void 0)
+], EnquiriesController.prototype, "assign", null);
+__decorate([
+    (0, common_1.Post)(':id/notes'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.STAFF),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", void 0)
+], EnquiriesController.prototype, "addNote", null);
 exports.EnquiriesController = EnquiriesController = __decorate([
     (0, common_1.Controller)('enquiries'),
     __metadata("design:paramtypes", [enquiries_service_1.EnquiriesService])

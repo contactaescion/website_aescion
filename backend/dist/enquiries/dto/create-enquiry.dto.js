@@ -17,6 +17,9 @@ class CreateEnquiryDto {
     email;
     course_interest;
     message;
+    type;
+    source;
+    session_id;
 }
 exports.CreateEnquiryDto = CreateEnquiryDto;
 __decorate([
@@ -46,4 +49,19 @@ __decorate([
     (0, class_validator_1.MinLength)(10),
     __metadata("design:type", String)
 ], CreateEnquiryDto.prototype, "message", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEnquiryDto.prototype, "type", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEnquiryDto.prototype, "source", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateEnquiryDto.prototype, "session_id", void 0);
 //# sourceMappingURL=create-enquiry.dto.js.map

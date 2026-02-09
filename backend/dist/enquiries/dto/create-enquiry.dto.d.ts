@@ -4,4 +4,7 @@ export declare class CreateEnquiryDto {
     email?: string;
     course_interest?: string;
     message: string;
+    type?: string;
+    source?: string;
+    session_id?: string;
 }

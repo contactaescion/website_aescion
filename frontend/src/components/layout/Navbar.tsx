@@ -1,11 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Search } from 'lucide-react';
 import { SearchModal } from '../common/SearchModal';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-export function Navbar() {
+interface NavLink {
+    name: string;
+    href: string;
+}
+
+interface NavbarProps {
+    links?: NavLink[];
+}
+
+export function Navbar({ links }: NavbarProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -15,14 +27,42 @@ export function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const navLinks = [
-        { name: 'Home', href: '#home' },
-        { name: 'Services', href: '#services' },
-        { name: 'Featured', href: '#featured' },
-        { name: 'Courses', href: '#courses' },
-        { name: 'Gallery', href: '#gallery' },
-        { name: 'Contact', href: '#contact' },
+    const defaultLinks = [
+        { name: 'Home', href: '/' },
+        { name: 'Services', href: '/#services' },
+        { name: 'Contact', href: '/#contact' },
     ];
+
+    const navLinks = links || defaultLinks;
+
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        // If it's a hash link on the current page, let default behavior happen (scroll)
+        // unless it's a cross-page hash link.
+        if (href.startsWith('/#')) {
+            e.preventDefault();
+            const [path, hash] = href.split('#');
+            if (location.pathname === path || (path === '/' && location.pathname === '/')) {
+                // Same page, just scroll
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                // Different page, navigate then scroll (handled by useEffect in layout usually, but simple navigate works)
+                navigate(href);
+            }
+        } else if (href.startsWith('#')) {
+            e.preventDefault();
+            const element = document.getElementById(href.substring(1));
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else if (href.startsWith('/')) {
+            e.preventDefault();
+            navigate(href);
+        }
+        setIsMobileMenuOpen(false);
+    };
 
     return (
         <>
@@ -33,7 +73,7 @@ export function Navbar() {
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <a href="#home" className="flex items-center gap-2 flex-shrink-0">
+                        <a href="/" onClick={(e) => handleNavClick(e, '/')} className="flex items-center gap-2 flex-shrink-0">
                             {/* Main Logo */}
                             <img src="/assets/logo.svg" alt="AESCION Logo" className="h-24 md:h-52 w-auto" />
                         </a>
@@ -44,7 +84,8 @@ export function Navbar() {
                                 <a
                                     key={link.name}
                                     href={link.href}
-                                    className="text-sm font-medium text-gray-700 hover:text-brand-blue transition-colors px-3 py-2 rounded-md hover:bg-black/5"
+                                    onClick={(e) => handleNavClick(e, link.href)}
+                                    className="text-sm font-medium text-gray-700 hover:text-brand-blue transition-colors px-3 py-2 rounded-md hover:bg-black/5 cursor-pointer"
                                 >
                                     {link.name}
                                 </a>
@@ -86,7 +127,7 @@ export function Navbar() {
                                 <a
                                     key={link.name}
                                     href={link.href}
-                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    onClick={(e) => handleNavClick(e, link.href)}
                                     className="block px-3 py-3 text-base font-medium text-gray-700 hover:text-brand-blue hover:bg-gray-50 rounded-lg"
                                 >
                                     {link.name}

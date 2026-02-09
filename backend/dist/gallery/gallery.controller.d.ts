@@ -6,5 +6,5 @@ export declare class GalleryController {
     upload(file: Express.Multer.File, title: string, description: string, category: GalleryCategory): Promise<import("./entities/gallery.entity").GalleryImage>;
     findAll(): Promise<import("./entities/gallery.entity").GalleryImage[]>;
     remove(id: string): Promise<import("./entities/gallery.entity").GalleryImage>;
-    update(id: string, updateDto: any): Promise<import("./entities/gallery.entity").GalleryImage | null>;
+    update(id: string, updateDto: any): Promise<import("./entities/gallery.entity").GalleryImage>;
 }
