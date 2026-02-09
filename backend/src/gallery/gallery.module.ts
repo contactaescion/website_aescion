@@ -8,5 +8,6 @@ import { GalleryImage } from './entities/gallery.entity';
   imports: [TypeOrmModule.forFeature([GalleryImage])],
   controllers: [GalleryController],
   providers: [GalleryService],
+  exports: [GalleryService],
 })
 export class GalleryModule { }

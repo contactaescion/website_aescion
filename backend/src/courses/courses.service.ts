@@ -34,4 +34,11 @@ export class CoursesService {
         await this.coursesRepository.delete(id);
         return { deleted: true };
     }
+
+    async search(query: string) {
+        return this.coursesRepository
+            .createQueryBuilder('course')
+            .where('course.title LIKE :query', { query: `%${query}%` })
+            .getMany();
+    }
 }

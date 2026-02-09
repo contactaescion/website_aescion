@@ -132,4 +132,11 @@ export class GalleryService {
         await this.galleryRepository.update(id, updateDto);
         return this.galleryRepository.findOne({ where: { id } });
     }
+
+    async search(query: string) {
+        return this.galleryRepository
+            .createQueryBuilder('gallery')
+            .where('gallery.title LIKE :query OR gallery.description LIKE :query', { query: `%${query}%` })
+            .getMany();
+    }
 }

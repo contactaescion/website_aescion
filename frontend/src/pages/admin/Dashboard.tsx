@@ -4,7 +4,9 @@ import { courses as coursesApi } from '../../api/courses';
 import { enquiries as enquiriesApi } from '../../api/enquiries';
 import { gallery as galleryApi } from '../../api/gallery';
 import { popups as popupsApi } from '../../api/popups';
-import { BookOpen, Users, MessageSquare, Image, Bell } from 'lucide-react';
+import { analytics as analyticsApi } from '../../api/analytics';
+import { BookOpen, Users, MessageSquare, Image, Bell, TrendingUp, Globe } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export function Dashboard() {
     const [stats, setStats] = useState({
@@ -12,23 +14,33 @@ export function Dashboard() {
         totalEnquiries: 0,
         newEnquiries: 0,
         totalImages: 0,
-        activePopups: 0
+        activePopups: 0,
+        totalVisits: 0,
+        uniqueVisitors: 0
     });
+    const [dailyVisits, setDailyVisits] = useState([]);
+    const [topPages, setTopPages] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // We use Promise.allSettled to ensure failure in one doesn't break others,
-                // but for simplicity/consistency with previous code we can use Promise.all
-                // or handle errors individually. 
-                // Let's use Promise.all and wrap in try-catch which is already there.
-                // Note: If endpoints don't exist yet, this might fail.
-                const [coursesData, enquiriesData, galleryData, popupsData] = await Promise.all([
+                const [
+                    coursesData,
+                    enquiriesData,
+                    galleryData,
+                    popupsData,
+                    analyticsStats,
+                    dailyData,
+                    topPagesData
+                ] = await Promise.all([
                     coursesApi.getAll().catch(() => []),
                     enquiriesApi.getAll().catch(() => []),
                     galleryApi.getAll().catch(() => []),
-                    popupsApi.getAll().catch(() => [])
+                    popupsApi.getAll().catch(() => []),
+                    analyticsApi.getStats().catch(() => ({ totalVisits: 0, uniqueVisitors: 0 })),
+                    analyticsApi.getDailyVisits().catch(() => []),
+                    analyticsApi.getTopPages().catch(() => [])
                 ]);
 
                 setStats({
@@ -36,8 +48,12 @@ export function Dashboard() {
                     totalEnquiries: enquiriesData.length,
                     newEnquiries: enquiriesData.filter((e: any) => e.status === 'NEW').length,
                     totalImages: galleryData.length,
-                    activePopups: popupsData.filter((p: any) => p.is_active).length
+                    activePopups: popupsData.filter((p: any) => p.is_active).length,
+                    totalVisits: analyticsStats.totalVisits,
+                    uniqueVisitors: analyticsStats.uniqueVisitors
                 });
+                setDailyVisits(dailyData);
+                setTopPages(topPagesData);
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {
@@ -64,12 +80,18 @@ export function Dashboard() {
         <div className="space-y-6">
             <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
-                    title="Total Courses"
-                    value={stats.totalCourses}
-                    icon={BookOpen}
-                    color="bg-blue-500"
+                    title="Total Visitors"
+                    value={stats.totalVisits}
+                    icon={TrendingUp}
+                    color="bg-emerald-500"
+                />
+                <StatCard
+                    title="Unique Visitors"
+                    value={stats.uniqueVisitors}
+                    icon={Globe}
+                    color="bg-teal-500"
                 />
                 <StatCard
                     title="Total Enquiries"
@@ -82,6 +104,48 @@ export function Dashboard() {
                     value={stats.newEnquiries}
                     icon={MessageSquare}
                     color="bg-orange-500"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Visitor Trends (Last 7 Days)</h2>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={dailyVisits}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Top Pages</h2>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={topPages} layout="vertical">
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis type="number" />
+                                <YAxis dataKey="path" type="category" width={150} tick={{ fontSize: 12 }} />
+                                <Tooltip />
+                                <Bar dataKey="count" fill="#3b82f6" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </Card>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-800 mt-8">Content Stats</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard
+                    title="Total Courses"
+                    value={stats.totalCourses}
+                    icon={BookOpen}
+                    color="bg-blue-500"
                 />
                 <StatCard
                     title="Gallery Images"

@@ -26,6 +26,9 @@ const enquiry_entity_1 = require("./enquiries/entities/enquiry.entity");
 const popups_module_1 = require("./popups/popups.module");
 const popup_entity_1 = require("./popups/entities/popup.entity");
 const mail_module_1 = require("./mail/mail.module");
+const analytics_module_1 = require("./analytics/analytics.module");
+const visitor_log_entity_1 = require("./analytics/entities/visitor-log.entity");
+const search_module_1 = require("./search/search.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,7 +45,7 @@ exports.AppModule = AppModule = __decorate([
                         return {
                             type: 'better-sqlite3',
                             database: 'aescion.sqlite',
-                            entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup],
+                            entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup, visitor_log_entity_1.VisitorLog],
                             synchronize: true,
                         };
                     }
@@ -53,13 +56,13 @@ exports.AppModule = AppModule = __decorate([
                         username: config.get('DB_USERNAME'),
                         password: config.get('DB_PASSWORD'),
                         database: config.get('DB_DATABASE'),
-                        entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup],
+                        entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup, visitor_log_entity_1.VisitorLog],
                         synchronize: config.get('NODE_ENV') !== 'production',
                         ssl: config.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
                     };
                 },
             }),
-            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule
+            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule, analytics_module_1.AnalyticsModule, search_module_1.SearchModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

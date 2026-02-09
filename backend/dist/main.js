@@ -8,10 +8,12 @@ const app_module_1 = require("./app.module");
 const config_1 = require("@nestjs/config");
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
+const compression_1 = __importDefault(require("compression"));
 const path_1 = require("path");
 const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.use((0, compression_1.default)());
     const configService = app.get(config_1.ConfigService);
     app.useBodyParser('json', { limit: '50mb' });
     app.useBodyParser('urlencoded', { limit: '50mb', extended: true });

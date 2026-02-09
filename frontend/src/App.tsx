@@ -11,6 +11,7 @@ import { PopupManager } from './pages/admin/PopupManager';
 import { ScrollNavigation } from './components/layout/ScrollNavigation';
 import { Dashboard } from './pages/admin/Dashboard';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { PageTracker } from './components/common/PageTracker';
 
 
 
@@ -41,6 +42,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <PageTracker />
       <ScrollNavigation />
     </BrowserRouter>
   );

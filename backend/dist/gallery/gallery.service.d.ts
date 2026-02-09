@@ -11,4 +11,5 @@ export declare class GalleryService {
     findAll(): Promise<GalleryImage[]>;
     remove(id: number): Promise<GalleryImage>;
     update(id: number, updateDto: Partial<GalleryImage>): Promise<GalleryImage | null>;
+    search(query: string): Promise<GalleryImage[]>;
 }

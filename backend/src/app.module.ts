@@ -17,6 +17,10 @@ import { Enquiry } from './enquiries/entities/enquiry.entity';
 import { PopupsModule } from './popups/popups.module';
 import { Popup } from './popups/entities/popup.entity';
 import { MailModule } from './mail/mail.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+
+import { VisitorLog } from './analytics/entities/visitor-log.entity';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -30,7 +34,7 @@ import { MailModule } from './mail/mail.module';
           return {
             type: 'better-sqlite3',
             database: 'aescion.sqlite',
-            entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
+            entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup, VisitorLog],
             synchronize: true, // Always sync for dev/test
           };
         }
@@ -41,13 +45,13 @@ import { MailModule } from './mail/mail.module';
           username: config.get<string>('DB_USERNAME'),
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_DATABASE'),
-          entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup],
+          entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup, VisitorLog],
           synchronize: config.get<string>('NODE_ENV') !== 'production',
           ssl: config.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
         };
       },
     }),
-    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule
+    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule, AnalyticsModule, SearchModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -43,6 +43,12 @@ let CoursesService = class CoursesService {
         await this.coursesRepository.delete(id);
         return { deleted: true };
     }
+    async search(query) {
+        return this.coursesRepository
+            .createQueryBuilder('course')
+            .where('course.title LIKE :query', { query: `%${query}%` })
+            .getMany();
+    }
 };
 exports.CoursesService = CoursesService;
 exports.CoursesService = CoursesService = __decorate([

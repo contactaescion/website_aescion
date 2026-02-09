@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
+import compression from 'compression';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -11,6 +12,11 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // ...
+
+  // Enable compression
+  app.use(compression());
+
   const configService = app.get(ConfigService);
 
   // Increase body limit for large images

@@ -10,4 +10,5 @@ export declare class CoursesService {
     remove(id: number): Promise<{
         deleted: boolean;
     }>;
+    search(query: string): Promise<Course[]>;
 }
