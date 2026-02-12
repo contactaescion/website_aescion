@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -16,6 +17,9 @@ async function bootstrap() {
 
   // Enable compression
   app.use(compression());
+
+  // Parse cookies for refresh tokens
+  app.use(cookieParser());
 
   const configService = app.get(ConfigService);
 
@@ -55,10 +59,16 @@ async function bootstrap() {
     transform: true,
   }));
 
-  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS', 'http://localhost:5173').split(',');
+  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS', 'http://localhost:5173,https://www.aesciontech.com,https://aesciontech.com').split(',');
   app.enableCors({
-    origin: allowedOrigins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

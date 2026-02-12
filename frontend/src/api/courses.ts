@@ -14,8 +14,12 @@ export interface Course {
 
 export const courses = {
     getAll: async () => {
-        const response = await client.get<Course[]>('/courses');
-        return response.data;
+        const response = await client.get('/courses');
+        // backend may return either an array or a paginated object { items, total, page }
+        const data = response.data as any;
+        if (Array.isArray(data)) return data as Course[];
+        if (data && Array.isArray(data.items)) return data.items as Course[];
+        return [] as Course[];
     },
     getOne: async (id: number) => {
         const response = await client.get<Course>(`/courses/${id}`);

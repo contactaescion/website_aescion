@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GalleryImage, GalleryCategory } from './entities/gallery.entity';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -88,6 +88,19 @@ export class GalleryService {
     async findAll() {
         const images = await this.galleryRepository.find({ order: { created_at: 'DESC' } });
         return Promise.all(images.map(img => this.signImage(img)));
+    }
+
+    // Public method to generate a presigned URL for a given s3 key
+    async getPresignedUrl(key: string, ttlSeconds?: number) {
+        if (this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key') {
+            // Return local uploads path if mock
+            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+            return `${baseUrl}/uploads/${key}`;
+        }
+        const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+        const command = new GetObjectCommand({ Bucket: this.bucketName, Key: key });
+        const expiresIn = ttlSeconds || Number(this.configService.get<string>('S3_PRESIGN_TTL') || '3600');
+        return await getSignedUrl(this.s3Client, command, { expiresIn });
     }
 
     async remove(id: number) {

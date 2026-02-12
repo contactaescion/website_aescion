@@ -22,12 +22,38 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async login(loginDto) {
+    async login(loginDto, res) {
         const user = await this.authService.validateUser(loginDto.email, loginDto.password);
         if (!user) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        return this.authService.login(user);
+        const tokens = await this.authService.login(user);
+        res.cookie('refresh_token', tokens.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return { access_token: tokens.access_token, user: tokens.user };
+    }
+    async refresh(req, res) {
+        const token = req.cookies?.refresh_token;
+        if (!token)
+            throw new common_1.UnauthorizedException('No refresh token');
+        const result = await this.authService.refreshTokens(token);
+        res.cookie('refresh_token', result.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        return { access_token: result.access_token };
+    }
+    async logout(req, res) {
+        res.clearCookie('refresh_token', { path: '/' });
+        return { message: 'Logged out' };
     }
     async forgotPassword(body) {
         return this.authService.forgotPassword(body.email);
@@ -43,10 +69,27 @@ exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [login_dto_1.LoginDto]),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('refresh'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refresh", null);
+__decorate([
+    (0, common_1.Post)('logout'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Post)('forgot-password'),
     __param(0, (0, common_1.Body)()),

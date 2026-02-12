@@ -27,8 +27,10 @@ let CoursesController = class CoursesController {
     create(createCourseDto) {
         return this.coursesService.create(createCourseDto);
     }
-    findAll() {
-        return this.coursesService.findAll();
+    findAll(page, limit, type, q) {
+        const pageNum = Math.max(1, parseInt(page || '1', 10));
+        const take = Math.min(100, parseInt(limit || '20', 10));
+        return this.coursesService.findAllPaginated({ page: pageNum, take, type, q });
     }
     findOne(id) {
         return this.coursesService.findOne(+id);
@@ -52,8 +54,12 @@ __decorate([
 ], CoursesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
+    __param(2, (0, common_1.Query)('type')),
+    __param(3, (0, common_1.Query)('q')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "findAll", null);
 __decorate([

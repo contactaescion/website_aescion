@@ -88,6 +88,16 @@ let GalleryService = class GalleryService {
         const images = await this.galleryRepository.find({ order: { created_at: 'DESC' } });
         return Promise.all(images.map(img => this.signImage(img)));
     }
+    async getPresignedUrl(key, ttlSeconds) {
+        if (this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key') {
+            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+            return `${baseUrl}/uploads/${key}`;
+        }
+        const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+        const command = new client_s3_1.GetObjectCommand({ Bucket: this.bucketName, Key: key });
+        const expiresIn = ttlSeconds || Number(this.configService.get('S3_PRESIGN_TTL') || '3600');
+        return await getSignedUrl(this.s3Client, command, { expiresIn });
+    }
     async remove(id) {
         const image = await this.galleryRepository.findOne({ where: { id } });
         if (!image)

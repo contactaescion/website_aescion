@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Button } from '../ui-kit/Button';
-import { Check,} from 'lucide-react';
+import { Check, } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { courses as coursesApi, type Course } from '../../api/courses';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
@@ -85,11 +86,13 @@ export function FeaturedCourse() {
                         </ul>
 
                         <div className="flex flex-wrap gap-4 pt-4">
-                            <a href="#contact">
-                                <Button size="lg" className="bg-brand-blue hover:bg-blue-600 text-white border-none shadow-lg shadow-blue-500/20">
-                                    Get Syllabus & Fees
-                                </Button>
-                            </a>
+                            <div className="flex flex-wrap gap-4 pt-4">
+                                <Link to="/#contact">
+                                    <Button size="lg" className="bg-brand-blue hover:bg-blue-600 text-white border-none shadow-lg shadow-blue-500/20">
+                                        Get Syllabus & Fees
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 

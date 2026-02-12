@@ -12,12 +12,14 @@ interface GalleryImage {
     public_url: string;
     thumb_url?: string;
     description?: string;
+    s3_key?: string;
 }
 
 export function Gallery() {
     const [images, setImages] = useState<GalleryImage[]>([]);
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [loading, setLoading] = useState(true);
+    const [overrides, setOverrides] = useState<Record<number, string>>({});
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -26,7 +28,20 @@ export function Gallery() {
             try {
                 const res = await fetch(`${API_URL}/gallery`);
                 const data = await res.json();
-                setImages(data);
+                if (Array.isArray(data) && data.length > 0) {
+                    setImages(data);
+                } else {
+                    // Fallback to local public assets when server returns empty
+                    const fallback = [
+                        { id: 1, title: 'Classroom', category: 'CLASSROOM', public_url: '/assets/class.jpeg', description: '' },
+                        { id: 2, title: 'Classroom Session', category: 'CLASSROOM', public_url: '/assets/class1.jpeg', description: '' },
+                        { id: 3, title: 'Event', category: 'EVENTS', public_url: '/assets/event.jpeg', description: '' },
+                        { id: 4, title: 'Event Highlight', category: 'EVENTS', public_url: '/assets/event1.jpeg', description: '' },
+                        { id: 5, title: 'Office Space', category: 'OFFICE', public_url: '/assets/office.jpeg', description: '' },
+                        { id: 6, title: 'Recruitment Drive', category: 'EVENTS', public_url: '/assets/recruitment.jpeg', description: '' },
+                    ];
+                    setImages(fallback as GalleryImage[]);
+                }
             } catch (error) {
                 console.error('Failed to fetch gallery images', error);
             } finally {
@@ -79,9 +94,22 @@ export function Gallery() {
                                         onClick={() => setSelectedImage(image)}
                                     >
                                         <img
-                                            src={image.public_url}
+                                            src={overrides[image.id] || image.public_url}
                                             alt={image.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            onError={async () => {
+                                                try {
+                                                    // Attempt to refresh signed url using s3_key when available
+                                                    // @ts-ignore
+                                                    const key = (image as any).s3_key || (image.public_url && image.public_url.split('/').pop());
+                                                    if (!key) return;
+                                                    const resp = await fetch(`${API_URL}/gallery/presign?key=${encodeURIComponent(key)}`);
+                                                    const j = await resp.json();
+                                                    if (j?.url) setOverrides(prev => ({ ...prev, [image.id]: j.url }));
+                                                } catch (e) {
+                                                    // ignore
+                                                }
+                                            }}
                                         />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <ZoomIn className="w-8 h-8 text-white" />

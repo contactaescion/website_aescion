@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { Course } from './entities/course.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,8 +18,15 @@ export class CoursesController {
     }
 
     @Get()
-    findAll() {
-        return this.coursesService.findAll();
+    findAll(
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('type') type?: string,
+        @Query('q') q?: string,
+    ) {
+        const pageNum = Math.max(1, parseInt(page || '1', 10));
+        const take = Math.min(100, parseInt(limit || '20', 10));
+        return this.coursesService.findAllPaginated({ page: pageNum, take, type, q });
     }
 
     @Get(':id')

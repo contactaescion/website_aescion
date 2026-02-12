@@ -38,6 +38,12 @@ let GalleryController = class GalleryController {
     update(id, updateDto) {
         return this.galleryService.update(+id, updateDto);
     }
+    async presign(key) {
+        if (!key)
+            return { error: 'missing key' };
+        const url = await this.galleryService.getPresignedUrl(key);
+        return { url };
+    }
 };
 exports.GalleryController = GalleryController;
 __decorate([
@@ -83,6 +89,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], GalleryController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('presign'),
+    __param(0, (0, common_1.Query)('key')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], GalleryController.prototype, "presign", null);
 exports.GalleryController = GalleryController = __decorate([
     (0, common_1.Controller)('gallery'),
     __metadata("design:paramtypes", [gallery_service_1.GalleryService])

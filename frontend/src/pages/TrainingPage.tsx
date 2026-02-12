@@ -21,7 +21,7 @@ export function TrainingPage() {
                 <Suspense fallback={<SectionLoader />}>
                     <FeaturedCourse />
                     <Courses />
-                    <Contact />
+                    <Contact showMap={false} />
                 </Suspense>
             </div>
         </div>

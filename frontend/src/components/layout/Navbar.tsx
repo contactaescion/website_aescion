@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Search } from 'lucide-react';
 import { SearchModal } from '../common/SearchModal';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 interface NavLink {
     name: string;
@@ -35,31 +35,37 @@ export function Navbar({ links }: NavbarProps) {
 
     const navLinks = links || defaultLinks;
 
-    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        // If it's a hash link on the current page, let default behavior happen (scroll)
-        // unless it's a cross-page hash link.
-        if (href.startsWith('/#')) {
-            e.preventDefault();
+    const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
+        e.preventDefault();
+
+        // Handle Hash Links
+        if (href.includes('#')) {
             const [path, hash] = href.split('#');
-            if (location.pathname === path || (path === '/' && location.pathname === '/')) {
-                // Same page, just scroll
-                const element = document.getElementById(hash);
+            const targetId = hash;
+
+            // If we need to change route first
+            if (path && path !== location.pathname && !(path === '/' && location.pathname === '/')) {
+                navigate(path);
+                // Wait for navigation then scroll
+                setTimeout(() => {
+                    const element = document.getElementById(targetId);
+                    if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } else {
+                // Same page scroll
+                const element = document.getElementById(targetId);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });
+                } else if (path) {
+                    // Fallback if element not found but path exists (e.g. just top of page)
+                    navigate(path);
+                    window.scrollTo(0, 0);
                 }
-            } else {
-                // Different page, navigate then scroll (handled by useEffect in layout usually, but simple navigate works)
-                navigate(href);
             }
-        } else if (href.startsWith('#')) {
-            e.preventDefault();
-            const element = document.getElementById(href.substring(1));
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        } else if (href.startsWith('/')) {
-            e.preventDefault();
+        } else {
+            // Standard Route
             navigate(href);
+            window.scrollTo(0, 0);
         }
         setIsMobileMenuOpen(false);
     };
@@ -73,10 +79,10 @@ export function Navbar({ links }: NavbarProps) {
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <a href="/" onClick={(e) => handleNavClick(e, '/')} className="flex items-center gap-2 flex-shrink-0">
+                        <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center gap-2 flex-shrink-0">
                             {/* Main Logo */}
                             <img src="/assets/logo.svg" alt="AESCION Logo" className="h-24 md:h-52 w-auto" />
-                        </a>
+                        </Link>
 
                         {/* Desktop Nav */}
                         <div className="hidden md:flex items-center space-x-1 lg:space-x-4">

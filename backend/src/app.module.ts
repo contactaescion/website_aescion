@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -32,8 +33,8 @@ import { SearchModule } from './search/search.module';
         const isSqlite = config.get<string>('DB_TYPE') === 'sqlite';
         if (isSqlite) {
           return {
-            type: 'better-sqlite3',
-            database: 'aescion.sqlite',
+            type: 'sqlite',
+            database: join(process.cwd(), 'database.sqlite'),
             entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup, VisitorLog],
             synchronize: true, // Always sync for dev/test
           };

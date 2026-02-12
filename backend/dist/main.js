@@ -9,11 +9,13 @@ const config_1 = require("@nestjs/config");
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = require("express-rate-limit");
 const compression_1 = __importDefault(require("compression"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const path_1 = require("path");
 const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, compression_1.default)());
+    app.use((0, cookie_parser_1.default)());
     const configService = app.get(config_1.ConfigService);
     app.useBodyParser('json', { limit: '50mb' });
     app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
@@ -40,10 +42,17 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
-    const allowedOrigins = configService.get('ALLOWED_ORIGINS', 'http://localhost:5173').split(',');
+    const allowedOrigins = configService.get('ALLOWED_ORIGINS', 'http://localhost:5173,https://www.aesciontech.com,https://aesciontech.com').split(',');
     app.enableCors({
-        origin: allowedOrigins,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
     });
     app.useStaticAssets((0, path_1.join)(__dirname, '..', 'uploads'), {

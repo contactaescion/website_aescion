@@ -1,48 +1,55 @@
 # AESCION Website Project Documentation
 
 ## 1. Project Overview
-This project is a modern, full-stack company website for **AESCION**, designed to showcase services, courses, and gallery, and facilitate enquiries. It consists of a high-performance public-facing site and a comprehensive admin dashboard for content management.
+This project is a modern, full-stack corporate website for **AESCION**, designed to showcase services, training courses, and company gallery while facilitating client enquiries. It features a high-performance public-facing site and a secure, comprehensive admin dashboard for content management.
 
 ## 2. Technology Stack
 
 ### Frontend
-- **Framework**: React (v18+) with Vite
-- **Styling**: TailwindCSS (v3/v4)
-- **State/Effects**: React Hooks
-- **Routing**: React Router DOM (v6)
-- **HTTP Client**: Axios
+- **Framework**: React (v19) with Vite
+- **Styling**: TailwindCSS (v4)
+- **Animation**: Framer Motion
 - **Icons**: Lucide React
+- **Routing**: React Router DOM (v7)
+- **HTTP Client**: Axios
+- **State Management**: React Hooks & Context
 
 ### Backend
-- **Framework**: NestJS
+- **Framework**: NestJS (v11)
 - **Language**: TypeScript
-- **Database**:
-  - **Development**: SQLite (`aescion.sqlite`) (or MySQL via config)
-  - **Production**: MySQL
+- **Database**: 
+  - **Development**: SQLite (`aescion.sqlite`)
+  - **Production**: MySQL (AWS RDS recommended)
 - **ORM**: TypeORM
-- **Storage**: AWS S3 (for image uploads) or Local Storage (Mock mode for dev)
-- **Features**: JWT Authentication, Rate Limiting, Security Headers (Helmet)
+- **Authentication**: JWT (JSON Web Tokens) with Passport
+- **Storage**: AWS S3 (for image uploads)
+- **Email**: Nodemailer (SMTP)
+- **Values**: Validation Pipes, Rate Limiting, Helmet Security
 
-## 3. Project Structure
+## 3. Project Structure & Modules
 
-The project is structured as a monorepo containing both frontend and backend applications.
+The project is organized as a monorepo with `frontend` and `backend` directories.
 
 ```
 /AESCION/Files/Website_Files
 ├── backend/            # NestJS Backend API
-│   ├── src/           
+│   ├── src/
+│   │   ├── analytics/  # Tracks site visits and page views
+│   │   ├── auth/       # JWT Authentication & Guards
 │   │   ├── courses/    # Course management (CRUD, Search)
-│   │   ├── enquiries/  # Enquiry processing & email notifications
-│   │   ├── gallery/    # Image gallery with S3 integration
-│   │   ├── auth/       # Authentication (JWT)
-│   │   ├── mail/       # Email service (Nodemailer)
-│   │   └── ...         # other modules (analytics, users, etc.)
-│   └── ...
+│   │   ├── enquiries/  # Contact form handling & Email triggers
+│   │   ├── gallery/    # Image upload & S3 management
+│   │   ├── mail/       # Email service implementation
+│   │   ├── popups/     # Marketing popup management
+│   │   ├── search/     # Global search functionality (Courses + Gallery)
+│   │   ├── testimonials/# Client testimonials management
+│   │   ├── users/      # Admin user management
+│   │   └── ...
 ├── frontend/           # React Frontend Application
 │   ├── src/
-│   │   ├── components/ # Reusable UI components & Sections
-│   │   ├── pages/      # Route pages (Public, Admin, Auth)
-│   │   ├── api/        # Axios instances & API calls
+│   │   ├── components/ # Reusable UI & Layouts
+│   │   ├── pages/      # Public & Admin Views
+│   │   ├── api/        # Axios integration
 │   │   └── ...
 └── README.md           # This file
 ```
@@ -50,70 +57,118 @@ The project is structured as a monorepo containing both frontend and backend app
 ## 4. Key Features
 
 ### Public Website
-- **Responsive Design**: Fully responsive layout optimized for all devices.
-- **Dynamic Content**:
-  - **Courses**: Browse and search available courses.
-  - **Gallery**: View company events and photos.
-  - **Services**: Overview of company offerings.
-- **Enquiry System**: Interest forms for potential clients/students.
-- **Recruitment**: Application portal for careers.
+- **Dynamic Content**: Real-time fetching of Courses, Gallery, and Services.
+- **Search**: Site-wide search for finding courses and images instantly.
+- **Responsive Design**: Optimized for Desktop, Tablet, and Mobile.
+- **Enquiry System**: Contact forms integrated with email notifications.
+- **Performance**: Lazy loading, optimized assets, and fast routing.
 
 ### Admin Dashboard
-- **Secure Login**: JWT-based authentication for administrators.
-- **Content Management**:
-  - **Courses**: Add, edit, delete, and feature courses.
-  - **Gallery**: Upload and manage images (supports AWS S3).
-  - **Enquiries**: View, filter, and manage incoming enquiries.
-- **Analytics**: Visualization of site traffic and user engagement.
-- **Settings**: Manage admin profile and configurations.
+- **Secure Access**: Protected via JWT Authentication.
+- **Analytics Dashboard**: Visual overview of site traffic and potential leads.
+- **Course Management**: Add, edit, delete, and feature training courses.
+- **Gallery Management**: Upload images directly to AWS S3.
+- **Enquiry Tracking**: View and manage incoming enquiries.
+- **Marketing**: Manage promotional popups.
 
-## 5. Application Processes & Data Flow
+## 5. AWS Hosting & Deployment Guide
 
-### Enquiry Process
-1.  **Submission**: User submits an enquiry form on the Public Website.
-2.  **API Handler**: Backend `EnquiriesController` receives the request.
-3.  **Processing**:
-    -   `EnquiriesService` saves the enquiry to the Database.
-    -   `MailService` is triggered to send an email notification to the admin.
-4.  **Admin View**: Admin sees the new enquiry in the Dashboard and can update its status (e.g., 'Contacted', 'Resolved').
+To host this application on AWS, follow standard industry practices for security and scalability.
 
-### Course Management
-1.  **Creation**: Admin fills out the course form (Title, Description, Image).
-2.  **Storage**: Image is uploaded to AWS S3 (or local mock).
-3.  **Database**: Course details + Image URL are saved in the Database.
-4.  **Public View**: The new course immediately appears on the "Courses" section of the public site.
+### Architecture Overview
+- **Frontend**: Hosted on **AWS S3** (Static Hosting) served via **AWS CloudFront** (CDN & SSL).
+- **Backend**: Containerized with **Docker** and deployed on **AWS ECS (Fargate)** or **AWS EC2**.
+- **Database**: **AWS RDS (MySQL)** for persistent data storage.
+- **Storage**: **AWS S3** bucket for user-uploaded images (Gallery/Courses).
+- **Domain**: Managed via **AWS Route 53**.
 
-### Authentication Flow
-1.  **Login**: Admin enters credentials on `/admin/login`.
-2.  **Verification**: Backend verifies hash against the database.
-3.  **Token**: A generic JWT access token is returned.
-4.  **Session**: Frontend stores the token (localStorage/cookie) and checks it via `AuthGuard` for protected routes.
+### Improvements & Changes Needed for AWS
 
-## 6. Setup Instructions
+#### 1. Database Migration (SQLite -> MySQL)
+The current setups uses SQLite for development. For AWS, you must switch to MySQL (RDS).
+- **Action**: Provision an RDS MySQL instance.
+- **Config**: Update `backend/.env` to point to the RDS endpoint.
+  ```env
+  DB_TYPE=mysql
+  DB_HOST=your-rds-endpoint.amazonaws.com
+  DB_PORT=3306
+  DB_USERNAME=admin
+  DB_PASSWORD=your_password
+  DB_DATABASE=aescion_db
+  ```
 
-### Prerequisites
-- Node.js (v18+)
-- npm
+#### 2. Backend Containerization (Docker)
+Create a `Dockerfile` in the `/backend` directory to containerize the NestJS app.
 
-### Installation & Running
-1.  **Backend**:
+**File: `backend/Dockerfile`**
+```dockerfile
+# Base image
+FROM node:18-alpine
+
+# Working directory
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Build
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["npm", "run", "start:prod"]
+```
+
+#### 3. Frontend Build & Deployment
+The frontend should be built as static assets.
+- **Build Command**: `cd frontend && npm run build`
+- **Output**: The `dist` folder contains the production artifacts.
+- **Deploy**: Sync the contents of `dist` to an S3 bucket configured for static website hosting.
+
+#### 4. Environment Variables
+Ensure all sensitive keys (AWS Keys, Database Credentials, JWT Secrets) are securely stored.
+- **AWS Parameter Store** or **Secrets Manager** is recommended for production.
+- For ECS, inject these as environment variables in the Task Definition.
+
+#### 5. CORS Configuration
+Update functionality in `main.ts` to allow requests from your production domain (e.g., `https://www.aescion.com`).
+
+### Deployment Steps (Summary)
+
+1.  **Database**: Create AWS RDS MySQL instance.
+2.  **Backend**:
+    -   Build Docker image: `docker build -t aescion-backend ./backend`
+    -   Push to AWS ECR (Elastic Container Registry).
+    -   Create ECS Service/Task Definition using the image.
+    -   Set environment variables in ECS.
+3.  **Frontend**:
+    -   Build React app: `npm run build`
+    -   Upload `frontend/dist` to S3 Bucket.
+    -   Create CloudFront Distribution pointing to S3 Bucket.
+4.  **DNS**: Point your domain (Route 53) to the CloudFront distribution (Frontend) and Load Balancer (Backend).
+
+## 6. Local Development Setup
+
+1.  **Clone Repository**: `git clone <repo_url>`
+2.  **Backend Setup**:
     ```bash
     cd backend
     npm install
-    # Set up .env as per .env.example
+    # Config .env
     npm run start:dev
     ```
-    *Runs on `http://localhost:3000`*
-
-2.  **Frontend**:
+3.  **Frontend Setup**:
     ```bash
     cd frontend
     npm install
-    # Create .env with VITE_API_URL=http://localhost:3000
     npm run dev
     ```
-    *Runs on `http://localhost:5173`*
 
-3.  **Default Admin Credentials**:
-    - **Email**: `admin@aescion.com` (check seeds or database)
-    - **Password**: `admin123` (common default, check your specific seed file)
+---
+*Documentation updated on 2026-02-12*

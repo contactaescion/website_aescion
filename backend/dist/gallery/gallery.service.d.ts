@@ -9,6 +9,7 @@ export declare class GalleryService {
     constructor(galleryRepository: Repository<GalleryImage>, configService: ConfigService);
     uploadFile(file: Express.Multer.File, title: string, description: string, category: GalleryCategory): Promise<GalleryImage>;
     findAll(): Promise<GalleryImage[]>;
+    getPresignedUrl(key: string, ttlSeconds?: number): Promise<string>;
     remove(id: number): Promise<GalleryImage>;
     update(id: number, updateDto: Partial<GalleryImage>): Promise<GalleryImage>;
     search(query: string): Promise<GalleryImage[]>;

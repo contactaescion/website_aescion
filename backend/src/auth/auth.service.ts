@@ -28,8 +28,11 @@ export class AuthService {
 
     async login(user: any) {
         const payload = { username: user.email, sub: user.id, role: user.role };
+        const access_token = this.jwtService.sign(payload, { expiresIn: '15m' });
+        const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token,
+            refresh_token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -37,6 +40,20 @@ export class AuthService {
                 role: user.role,
             },
         };
+    }
+
+    async refreshTokens(refreshToken: string) {
+        try {
+            const payload = this.jwtService.verify(refreshToken);
+            const user = await this.usersService.findOneByEmail(payload.username);
+            if (!user) throw new UnauthorizedException('Invalid refresh token');
+            const newPayload = { username: user.email, sub: user.id, role: user.role };
+            const access_token = this.jwtService.sign(newPayload, { expiresIn: '15m' });
+            const new_refresh_token = this.jwtService.sign(newPayload, { expiresIn: '7d' });
+            return { access_token, refresh_token: new_refresh_token, user: { id: user.id, email: user.email, role: user.role } };
+        } catch (e) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
     }
 
     async forgotPassword(email: string) {

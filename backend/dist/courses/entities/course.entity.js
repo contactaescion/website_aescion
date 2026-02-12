@@ -9,23 +9,49 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Course = void 0;
+exports.Course = exports.CourseStatus = exports.CourseType = void 0;
 const typeorm_1 = require("typeorm");
+var CourseType;
+(function (CourseType) {
+    CourseType["COURSE"] = "course";
+    CourseType["INTERNSHIP"] = "internship";
+    CourseType["WORKSHOP"] = "workshop";
+    CourseType["WEBINAR"] = "webinar";
+})(CourseType || (exports.CourseType = CourseType = {}));
+var CourseStatus;
+(function (CourseStatus) {
+    CourseStatus["DRAFT"] = "draft";
+    CourseStatus["PUBLISHED"] = "published";
+    CourseStatus["ARCHIVED"] = "archived";
+})(CourseStatus || (exports.CourseStatus = CourseStatus = {}));
 let Course = class Course {
     id;
     title;
+    slug;
+    imageUrl;
+    type;
+    status;
     duration;
     fees;
-    timing;
     mode;
     placement_support;
     trainer_name;
-    trainer_experience;
     modules;
     is_featured;
     code_snippet;
     created_at;
     updated_at;
+    generateSlug() {
+        if ((!this.slug || this.slug === '') && this.title) {
+            const s = this.title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            this.slug = `${s}-${Date.now().toString().slice(-4)}`;
+        }
+    }
 };
 exports.Course = Course;
 __decorate([
@@ -37,33 +63,41 @@ __decorate([
     __metadata("design:type", String)
 ], Course.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", Object)
+], Course.prototype, "slug", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Course.prototype, "imageUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'enum', enum: CourseType, default: CourseType.COURSE }),
+    __metadata("design:type", String)
+], Course.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT }),
+    __metadata("design:type", String)
+], Course.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Course.prototype, "duration", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Course.prototype, "fees", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Course.prototype, "timing", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Course.prototype, "mode", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: true }),
+    (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], Course.prototype, "placement_support", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Course.prototype, "trainer_name", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Course.prototype, "trainer_experience", void 0);
 __decorate([
     (0, typeorm_1.Column)('simple-json', { nullable: true }),
     __metadata("design:type", Object)
@@ -84,6 +118,13 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], Course.prototype, "updated_at", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    (0, typeorm_1.BeforeUpdate)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], Course.prototype, "generateSlug", null);
 exports.Course = Course = __decorate([
     (0, typeorm_1.Entity)('courses')
 ], Course);

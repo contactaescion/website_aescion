@@ -14,6 +14,7 @@ import { GalleryManager } from './pages/admin/GalleryManager';
 import { EnquiriesManager } from './pages/admin/EnquiriesManager';
 import { PopupManager } from './pages/admin/PopupManager';
 import { ScrollNavigation } from './components/layout/ScrollNavigation';
+import { ScrollToTop } from './components/layout/ScrollToTop';
 import { Dashboard } from './pages/admin/Dashboard';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { PageTracker } from './components/common/PageTracker';
@@ -65,6 +66,8 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <PageTracker />
+      <PageTracker />
+      <ScrollToTop />
       <ScrollNavigation />
     </BrowserRouter>
   );

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Patch, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Patch, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GalleryService } from './gallery.service';
 import { GalleryCategory } from './entities/gallery.entity';
@@ -49,5 +49,13 @@ export class GalleryController {
     @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
     update(@Param('id') id: string, @Body() updateDto: any) {
         return this.galleryService.update(+id, updateDto);
+    }
+
+    // Return a presigned GET URL for an image key (key param is s3_key or stored key)
+    @Get('presign')
+    async presign(@Query('key') key: string) {
+        if (!key) return { error: 'missing key' };
+        const url = await this.galleryService.getPresignedUrl(key);
+        return { url };
     }
 }

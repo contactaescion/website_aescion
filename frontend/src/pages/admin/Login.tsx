@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '../../components/ui-kit/Button';
 import { Input } from '../../components/ui-kit/Input';
 import { Card } from '../../components/ui-kit/Card';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../api/auth';
 import { useState } from 'react';
 
@@ -87,9 +87,9 @@ export function Login() {
                 </form>
             </Card>
 
-            <a href="/" className="fixed top-4 left-4 text-gray-600 hover:text-gray-900 text-sm font-medium">
-                &larr; Back to Website
-            </a>
+            <Link to="/" className="fixed top-4 left-4 text-gray-600 hover:text-gray-900 text-sm font-medium">
+                &larr; Back to Home
+            </Link>
         </div>
     );
 }

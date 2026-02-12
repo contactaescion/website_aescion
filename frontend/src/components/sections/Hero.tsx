@@ -140,12 +140,12 @@ export function Hero({
                         transition={{ duration: 0.8, delay: 0.6 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
                     >
-                        <a href="#contact" className="w-full sm:w-auto">
+                        <Link to="/#contact" className="w-full sm:w-auto">
                             <Button size="lg" className="w-full sm:w-auto gap-2 shadow-lg shadow-brand-blue/20">
                                 Get Started
                                 <ArrowRight className="w-5 h-5" />
                             </Button>
-                        </a>
+                        </Link>
                         <a href="https://wa.me/917550068877" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                             <Button size="lg" variant="secondary" className="w-full sm:w-auto gap-2 border-gray-200">
                                 <MessageCircle className="w-5 h-5" />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card } from '../ui-kit/Card';
 import { Button } from '../ui-kit/Button';
@@ -12,22 +13,41 @@ export function Courses() {
     const [search, setSearch] = useState('');
 
     useEffect(() => {
+        let mounted = true;
         const fetchCourses = async () => {
             try {
                 const data = await coursesApi.getAll();
-                setCourses(data);
+                if (mounted) {
+                    if (Array.isArray(data) && data.length > 0) setCourses(data);
+                    else {
+                        // Fallback sample courses when backend returns none
+                        setCourses([
+                            { id: 1, title: 'Python Full Stack', duration: '3 Months', fees: '₹10,000', mode: 'Offline / Online', is_featured: false, placement_support: true },
+                            { id: 2, title: 'Java Full Stack', duration: '3 Months', fees: '₹10,000', mode: 'Offline / Online', is_featured: true, placement_support: true },
+                        ] as Course[]);
+                    }
+                }
             } catch (error) {
                 console.error('Failed to fetch courses', error);
+                // Simple retry logic could go here, or UI error state
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         };
 
         fetchCourses();
+
+        // Refresh data on focus (Simple "React Query lite" behavior)
+        const onFocus = () => fetchCourses();
+        window.addEventListener('focus', onFocus);
+
+        return () => {
+            mounted = false;
+            window.removeEventListener('focus', onFocus);
+        };
     }, []);
 
     const filteredCourses = courses
-        .filter(c => !c.is_featured) // Exclude featured courses to avoid duplicates
         .filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
     if (loading) {
@@ -92,11 +112,11 @@ export function Courses() {
 
                                     <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                                         <div className="text-brand-orange font-bold text-lg">{course.fees}</div>
-                                        <a href="#contact">
+                                        <Link to="/#contact">
                                             <Button size="sm" variant="outline">
                                                 Enquire
                                             </Button>
-                                        </a>
+                                        </Link>
                                     </div>
                                 </Card>
                             </motion.div>

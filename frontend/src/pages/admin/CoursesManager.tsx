@@ -107,6 +107,7 @@ export function CoursesManager() {
                             <Input label="Duration" {...register('duration', { required: true })} required />
                             <Input label="Fees" {...register('fees', { required: true })} required />
                             <Input label="Mode" {...register('mode', { required: true })} required />
+                            <Input label="Image URL (Public URL)" {...register('image_url')} placeholder="https://..." />
                         </div>
 
                         <div className="space-y-2">

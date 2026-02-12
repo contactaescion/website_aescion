@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface FooterProps {
     hideCourses?: boolean;
@@ -36,9 +37,9 @@ export function Footer({ hideCourses }: FooterProps) {
                         <ul className="space-y-3">
                             {['Home', 'Services', 'Courses', 'Gallery', 'Contact'].map((item) => (
                                 <li key={item}>
-                                    <a href={`#${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-colors text-sm">
+                                    <Link to={`/#${item.toLowerCase()}`} className="text-gray-300 hover:text-white transition-colors text-sm">
                                         {item}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                             {/* <li>

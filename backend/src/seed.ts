@@ -4,6 +4,7 @@ import { UsersService } from './users/users.service';
 import { CoursesService } from './courses/courses.service';
 import { UserRole } from './users/entities/user.entity';
 import { GalleryImage, GalleryCategory } from './gallery/entities/gallery.entity';
+import { Course } from './courses/entities/course.entity';
 import { DataSource } from 'typeorm';
 
 async function bootstrap() {
@@ -20,13 +21,11 @@ async function bootstrap() {
     let adminUser = await usersService.findOneByEmail(adminEmail);
 
     if (adminUser) {
-        console.log('Admin user exists, updating password...');
-        // Force update password
-        const hashedPassword = await import('bcrypt').then(m => m.hash(adminPassword, 10));
-        adminUser.password = hashedPassword;
-        adminUser.role = UserRole.SUPER_ADMIN;
-        await usersService.save(adminUser);
-        console.log('Admin password updated');
+        console.log('Admin user exists, skipping password reset...');
+        if (adminUser.role !== UserRole.SUPER_ADMIN) {
+            adminUser.role = UserRole.SUPER_ADMIN;
+            await usersService.save(adminUser);
+        }
     } else {
         console.log('Creating Admin user...');
         await usersService.create({
@@ -48,9 +47,17 @@ async function bootstrap() {
         { title: 'MEAN Stack', duration: '3 Months', fees: '₹10,000', timing: '7:30 PM - 9:00 PM', mode: 'Offline / Online', placement_support: true },
     ];
 
+    // Use repository to check existence
+    const dataSource = app.get(DataSource);
+    const courseRepo = dataSource.getRepository(Course);
+
     for (const c of courses) {
         try {
-            await coursesService.create(c);
+            const existing = await courseRepo.findOne({ where: { title: c.title } });
+            if (!existing) {
+                await coursesService.create(c);
+                console.log(`Seeded course: ${c.title}`);
+            }
         } catch (e) {
             console.error('Error seeding course', c.title);
         }
@@ -62,7 +69,7 @@ async function bootstrap() {
     // safer to use EntityManager or module reference if available, but let's try strict app.get first if we can inject a service or repo.
     // Actually, let's use the service if it has a create method for raw data, currently it expects file upload.
     // So we will use DataSource or Repository directly.
-    const dataSource = app.get(DataSource);
+    // const dataSource = app.get(DataSource); // Already declared above
     const galleryRepo = dataSource.getRepository(GalleryImage);
 
     console.log('Seeding Gallery...');
