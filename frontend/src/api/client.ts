@@ -51,8 +51,10 @@ client.interceptors.response.use(
         const original = error.config;
         if (!original) return Promise.reject(error);
 
+        // If 401 and we haven't retried yet
         if (error.response?.status === 401 && !original._retry) {
             original._retry = true;
+
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject, config: original });
@@ -61,23 +63,39 @@ client.interceptors.response.use(
 
             isRefreshing = true;
             try {
+                // Remove trailing slash from baseURL just in case, though usually handled
                 const refresh = await axios.post(
                     `${baseURL.replace(/\/$/, '')}/auth/refresh`,
                     {},
                     { withCredentials: true },
                 );
+
                 const newToken = refresh.data?.access_token || refresh.data?.accessToken;
                 if (newToken) {
                     sessionStorage.setItem('access_token', newToken);
+
+                    // Update the *original* config headers for the retry
+                    original.headers = original.headers || {};
                     original.headers.Authorization = `Bearer ${newToken}`;
+
+                    // Process cached requests
                     processQueue(null, newToken);
-                    return client(original);
+
+                    // Return the retry of the original request
+                    // We must pass the modified 'original' config
+                    // Important: create a new object to avoid axios internal state issues?
+                    return client({ ...original });
                 }
                 throw new Error('Refresh did not return access token');
             } catch (e) {
                 processQueue(e, null);
+                // Only redirect if it's truly a session expiry and not a transient error
                 sessionStorage.removeItem('access_token');
-                window.location.href = '/admin/login';
+
+                // Avoid redirect loop - only redirect if key is admin and not login
+                if (window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
+                    window.location.href = '/admin/login';
+                }
                 return Promise.reject(e);
             } finally {
                 isRefreshing = false;

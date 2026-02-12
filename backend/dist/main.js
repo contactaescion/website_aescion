@@ -42,10 +42,14 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
-    const allowedOrigins = configService.get('ALLOWED_ORIGINS', 'http://localhost:5173,https://www.aesciontech.com,https://aesciontech.com').split(',');
+    const allowedOrigins = configService.get('ALLOWED_ORIGINS', 'http://localhost:5173,https://www.aesciontech.com,https://aesciontech.com')
+        .split(',')
+        .map(origin => origin.trim());
     app.enableCors({
         origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
+            if (!origin)
+                return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, true);
             }
             else {
@@ -54,11 +58,12 @@ async function bootstrap() {
         },
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
+        exposedHeaders: ['Content-Disposition', 'x-session-id'],
     });
     app.useStaticAssets((0, path_1.join)(__dirname, '..', 'uploads'), {
         prefix: '/uploads/',
     });
-    await app.listen(process.env.PORT ?? 3000);
+    await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

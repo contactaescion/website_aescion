@@ -41,13 +41,14 @@ let CoursesService = class CoursesService {
         qb.orderBy('c.is_featured', 'DESC').addOrderBy('c.created_at', 'DESC');
         qb.take(take).skip(skip);
         const [items, total] = await qb.getManyAndCount();
-        return { items, total, page, pageSize: take };
+        const transformedItems = items.map(course => this.transformCourseImage(course));
+        return { items: transformedItems, total, page, pageSize: take };
     }
     async findOne(id) {
         const course = await this.coursesRepository.findOne({ where: { id } });
         if (!course)
             throw new common_1.NotFoundException('Course not found');
-        return course;
+        return this.transformCourseImage(course);
     }
     async update(id, updateCourseDto) {
         await this.coursesRepository.update(id, updateCourseDto);
@@ -58,10 +59,22 @@ let CoursesService = class CoursesService {
         return { deleted: true };
     }
     async search(query) {
-        return this.coursesRepository
+        const courses = await this.coursesRepository
             .createQueryBuilder('course')
             .where('course.title LIKE :query', { query: `%${query}%` })
             .getMany();
+        return courses.map(c => this.transformCourseImage(c));
+    }
+    transformCourseImage(course) {
+        if (course.imageUrl && (course.imageUrl.includes('s3.amazonaws.com') || course.imageUrl.includes('s3') && course.imageUrl.includes('amazonaws'))) {
+            const parts = course.imageUrl.split('amazonaws.com/');
+            if (parts.length > 1) {
+                const key = parts[1];
+                const apiUrl = process.env.API_URL || 'http://localhost:3000';
+                course.imageUrl = `${apiUrl}/images/proxy/${key}`;
+            }
+        }
+        return course;
     }
 };
 exports.CoursesService = CoursesService;

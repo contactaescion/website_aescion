@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Search } from 'lucide-react';
-import { SearchModal } from '../common/SearchModal';
+import { Menu, X } from 'lucide-react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 interface NavLink {
@@ -15,7 +14,6 @@ interface NavbarProps {
 export function Navbar({ links }: NavbarProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -96,24 +94,10 @@ export function Navbar({ links }: NavbarProps) {
                                     {link.name}
                                 </a>
                             ))}
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="p-2 text-gray-600 hover:text-brand-blue transition-colors hover:bg-black/5 rounded-full"
-                                aria-label="Search"
-                            >
-                                <Search className="w-5 h-5" />
-                            </button>
                         </div>
 
                         {/* Mobile Menu Button */}
                         <div className="md:hidden flex items-center gap-2">
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="p-2 text-gray-600 hover:text-brand-blue transition-colors"
-                                aria-label="Search"
-                            >
-                                <Search className="w-6 h-6" />
-                            </button>
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="p-2 text-gray-600 hover:text-brand-blue transition-colors"
@@ -139,12 +123,10 @@ export function Navbar({ links }: NavbarProps) {
                                     {link.name}
                                 </a>
                             ))}
-
                         </div>
                     </div>
                 )}
             </nav>
-            <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
         </>
     );
 }

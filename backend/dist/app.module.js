@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const path_1 = require("path");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
@@ -29,6 +30,7 @@ const mail_module_1 = require("./mail/mail.module");
 const analytics_module_1 = require("./analytics/analytics.module");
 const visitor_log_entity_1 = require("./analytics/entities/visitor-log.entity");
 const search_module_1 = require("./search/search.module");
+const images_module_1 = require("./images/images.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -43,8 +45,8 @@ exports.AppModule = AppModule = __decorate([
                     const isSqlite = config.get('DB_TYPE') === 'sqlite';
                     if (isSqlite) {
                         return {
-                            type: 'better-sqlite3',
-                            database: 'aescion.sqlite',
+                            type: 'sqlite',
+                            database: (0, path_1.join)(process.cwd(), 'database.sqlite'),
                             entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup, visitor_log_entity_1.VisitorLog],
                             synchronize: true,
                         };
@@ -62,7 +64,7 @@ exports.AppModule = AppModule = __decorate([
                     };
                 },
             }),
-            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule, analytics_module_1.AnalyticsModule, search_module_1.SearchModule
+            auth_module_1.AuthModule, users_module_1.UsersModule, courses_module_1.CoursesModule, gallery_module_1.GalleryModule, testimonials_module_1.TestimonialsModule, enquiries_module_1.EnquiriesModule, popups_module_1.PopupsModule, mail_module_1.MailModule, analytics_module_1.AnalyticsModule, search_module_1.SearchModule, images_module_1.ImagesModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

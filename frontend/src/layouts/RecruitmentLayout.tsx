@@ -6,9 +6,9 @@ import { useEffect } from 'react';
 export function RecruitmentLayout() {
     const links = [
         { name: 'Home', href: '/' },
-        { name: 'Hire Talent', href: '/recruitment' },
+        { name: 'Hire Talent', href: '/recruitment' }, // Resets top
         { name: 'Services', href: '/recruitment#services' },
-        { name: 'Contact', href: '/recruitment#contact' },
+        { name: 'Contact', href: '/recruitment#enquiry-form' }, // Fixed ID mismatch
     ];
 
     const location = useLocation();

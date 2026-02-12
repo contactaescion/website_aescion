@@ -20,30 +20,25 @@ export function Gallery() {
     const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [loading, setLoading] = useState(true);
     const [overrides, setOverrides] = useState<Record<number, string>>({});
+    const [error, setError] = useState<string | null>(null);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     useEffect(() => {
         const fetchImages = async () => {
             try {
+                setError(null);
                 const res = await fetch(`${API_URL}/gallery`);
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
                 if (Array.isArray(data) && data.length > 0) {
                     setImages(data);
                 } else {
-                    // Fallback to local public assets when server returns empty
-                    const fallback = [
-                        { id: 1, title: 'Classroom', category: 'CLASSROOM', public_url: '/assets/class.jpeg', description: '' },
-                        { id: 2, title: 'Classroom Session', category: 'CLASSROOM', public_url: '/assets/class1.jpeg', description: '' },
-                        { id: 3, title: 'Event', category: 'EVENTS', public_url: '/assets/event.jpeg', description: '' },
-                        { id: 4, title: 'Event Highlight', category: 'EVENTS', public_url: '/assets/event1.jpeg', description: '' },
-                        { id: 5, title: 'Office Space', category: 'OFFICE', public_url: '/assets/office.jpeg', description: '' },
-                        { id: 6, title: 'Recruitment Drive', category: 'EVENTS', public_url: '/assets/recruitment.jpeg', description: '' },
-                    ];
-                    setImages(fallback as GalleryImage[]);
+                    setImages([]); // Ensure empty state
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to fetch gallery images', error);
+                setError(error.message || 'Failed to load images');
             } finally {
                 setLoading(false);
             }
@@ -61,7 +56,13 @@ export function Gallery() {
                     <p className="text-gray-600">A glimpse into our classrooms, events, and student achievements.</p>
                 </div>
 
-
+                {/* Error State */}
+                {error && (
+                    <div className="text-center py-12 text-red-500">
+                        <p>{error}</p>
+                        <button onClick={() => window.location.reload()} className="underline mt-2">Retry</button>
+                    </div>
+                )}
 
                 {/* Grid */}
                 {loading ? (
@@ -76,7 +77,7 @@ export function Gallery() {
                             </div>
                         ))}
                     </div>
-                ) : filteredImages.length === 0 ? (
+                ) : !error && filteredImages.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">No images found in this category.</div>
                 ) : (
                     <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -98,16 +99,29 @@ export function Gallery() {
                                             alt={image.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             onError={async () => {
+                                                // Prevent infinite loop if we already have an override for this ID
+                                                if (overrides[image.id]) return;
+
                                                 try {
+                                                    console.log('Image failed, trying proxy:', image.title);
                                                     // Attempt to refresh signed url using s3_key when available
                                                     // @ts-ignore
                                                     const key = (image as any).s3_key || (image.public_url && image.public_url.split('/').pop());
                                                     if (!key) return;
-                                                    const resp = await fetch(`${API_URL}/gallery/presign?key=${encodeURIComponent(key)}`);
-                                                    const j = await resp.json();
-                                                    if (j?.url) setOverrides(prev => ({ ...prev, [image.id]: j.url }));
+                                                    await fetch(`${API_URL}/images/proxy/${encodeURIComponent(key)}`); // Use direct proxy URL if presign endpoint is just a wrapper
+                                                    // Actually presign endpoint returns JSON {url: ...}. Let's stick to presign for consistency 
+                                                    // BUT if presign just returns the proxy URL, we can use that.
+                                                    // Let's use the presign endpoint as before but with check.
+
+                                                    const presignResp = await fetch(`${API_URL}/gallery/presign?key=${encodeURIComponent(key)}`);
+                                                    if (presignResp.ok) {
+                                                        const j = await presignResp.json();
+                                                        if (j?.url && j.url !== overrides[image.id]) {
+                                                            setOverrides(prev => ({ ...prev, [image.id]: j.url }));
+                                                        }
+                                                    }
                                                 } catch (e) {
-                                                    // ignore
+                                                    console.error('Fallback failed for', image.title);
                                                 }
                                             }}
                                         />

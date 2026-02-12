@@ -145,22 +145,15 @@ let GalleryService = class GalleryService {
         return Promise.all(images.map(img => this.signImage(img)));
     }
     async signImage(image) {
-        if (this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key') {
+        const isMock = this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key';
+        if (isMock) {
             return image;
         }
-        try {
-            const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
-            const { GetObjectCommand } = await import("@aws-sdk/client-s3");
-            const command = new GetObjectCommand({ Bucket: this.bucketName, Key: image.s3_key });
-            const url = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
-            image.public_url = url;
-            image.thumb_url = url;
-            return image;
-        }
-        catch (e) {
-            console.error('Error signing URL for image:', image.id, e);
-            return image;
-        }
+        const baseUrl = process.env.API_BASE_URL || 'https://api.aesciontech.com';
+        const apiUrl = this.configService.get('API_URL') || 'http://localhost:3000';
+        image.public_url = `${apiUrl}/images/proxy/${image.s3_key}`;
+        image.thumb_url = `${apiUrl}/images/proxy/${image.s3_key}`;
+        return image;
     }
 };
 exports.GalleryService = GalleryService;

@@ -40,10 +40,10 @@ const RecruitmentPage = () => {
                             transition={{ delay: 0.3 }}
                             className="flex flex-col sm:flex-row items-center justify-center gap-4"
                         >
-                            <Link to="/#enquiry-form" className="px-8 py-4 bg-brand-blue text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors w-full sm:w-auto text-center">
+                            <Link to="/recruitment#enquiry-form" className="px-8 py-4 bg-brand-blue text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors w-full sm:w-auto text-center">
                                 Hire Talent
                             </Link>
-                            <Link to="/#process" className="px-8 py-4 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors w-full sm:w-auto backdrop-blur-sm text-center">
+                            <Link to="/recruitment#process" className="px-8 py-4 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors w-full sm:w-auto backdrop-blur-sm text-center">
                                 Hiring Process
                             </Link>
                         </motion.div>

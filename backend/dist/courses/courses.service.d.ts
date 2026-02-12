@@ -22,4 +22,5 @@ export declare class CoursesService {
         deleted: boolean;
     }>;
     search(query: string): Promise<Course[]>;
+    private transformCourseImage;
 }

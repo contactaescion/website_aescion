@@ -17,10 +17,10 @@ export class Course {
     @Column({ nullable: true })
     imageUrl: string;
 
-    @Column({ type: 'enum', enum: CourseType, default: CourseType.COURSE })
+    @Column({ type: 'simple-enum', enum: CourseType, default: CourseType.COURSE })
     type: CourseType;
 
-    @Column({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT })
+    @Column({ type: 'simple-enum', enum: CourseStatus, default: CourseStatus.DRAFT })
     status: CourseStatus;
 
     @Column({ nullable: true })

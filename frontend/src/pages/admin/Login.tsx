@@ -25,8 +25,14 @@ export function Login() {
             navigate('/admin/dashboard');
         } catch (err: any) {
             console.error('Login failed', err);
+            // Ensure we don't reload or redirect
             setError('Invalid email or password');
         }
+    };
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        handleSubmit(onSubmit)(e);
     };
 
     const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +45,7 @@ export function Login() {
                     <p className="text-gray-500 text-sm mt-2">Sign in to manage the website</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={handleFormSubmit} className="space-y-6">
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">
                             {error}

@@ -16,7 +16,6 @@ export function AdminLayout() {
             category: 'Overview',
             items: [
                 { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard', roles: ['SUPER_ADMIN', 'STAFF', 'HR', 'TRAINER'] },
-                { icon: LayoutDashboard, label: 'Analytics', href: '/admin/dashboard', roles: ['SUPER_ADMIN'] }, // Placeholder
             ]
         },
         {
@@ -35,12 +34,7 @@ export function AdminLayout() {
                 // { icon: FileText, label: 'Job Requests', href: '/admin/jobs', roles: ['SUPER_ADMIN', 'HR'] }, // Placeholder
             ]
         },
-        {
-            category: 'System',
-            items: [
-                { icon: Users, label: 'Settings', href: '/admin/profile', roles: ['SUPER_ADMIN'] },
-            ]
-        }
+
     ];
 
     // Helper to check role access

@@ -49,11 +49,26 @@ export function Footer({ hideCourses }: FooterProps) {
                     </div>
 
                     {/* Courses */}
+                    {/* Courses (Student View) */}
                     {!hideCourses && (
                         <div>
                             <h3 className="text-lg font-semibold mb-6 text-brand-orange">Top Courses</h3>
                             <ul className="space-y-3">
                                 {['Java Full Stack', 'Python Full Stack', 'MERN Stack', 'Embedded Systems', 'IoT', 'Data Analyst'].map((item) => (
+                                    <li key={item} className="text-gray-300 text-sm">
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Recruitment Services (HR View) */}
+                    {hideCourses && (
+                        <div>
+                            <h3 className="text-lg font-semibold mb-6 text-brand-orange">HR Solutions</h3>
+                            <ul className="space-y-3">
+                                {['HR Recruiter', 'Campus Hiring', 'Lateral Hiring', 'Contract Staffing'].map((item) => (
                                     <li key={item} className="text-gray-300 text-sm">
                                         {item}
                                     </li>

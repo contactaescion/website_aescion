@@ -71,11 +71,11 @@ __decorate([
     __metadata("design:type", String)
 ], Course.prototype, "imageUrl", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: CourseType, default: CourseType.COURSE }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: CourseType, default: CourseType.COURSE }),
     __metadata("design:type", String)
 ], Course.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT }),
+    (0, typeorm_1.Column)({ type: 'simple-enum', enum: CourseStatus, default: CourseStatus.DRAFT }),
     __metadata("design:type", String)
 ], Course.prototype, "status", void 0);
 __decorate([

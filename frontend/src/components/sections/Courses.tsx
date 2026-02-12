@@ -11,25 +11,22 @@ export function Courses() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let mounted = true;
-        const fetchCourses = async () => {
+        const fetchCourses = async (isRefetch = false) => {
             try {
+                if (!isRefetch) setLoading(true);
+                setError(null);
                 const data = await coursesApi.getAll();
                 if (mounted) {
                     if (Array.isArray(data) && data.length > 0) setCourses(data);
-                    else {
-                        // Fallback sample courses when backend returns none
-                        setCourses([
-                            { id: 1, title: 'Python Full Stack', duration: '3 Months', fees: '₹10,000', mode: 'Offline / Online', is_featured: false, placement_support: true },
-                            { id: 2, title: 'Java Full Stack', duration: '3 Months', fees: '₹10,000', mode: 'Offline / Online', is_featured: true, placement_support: true },
-                        ] as Course[]);
-                    }
+                    else setCourses([]); // Ensure empty state if no data
                 }
-            } catch (error) {
-                console.error('Failed to fetch courses', error);
-                // Simple retry logic could go here, or UI error state
+            } catch (err: any) {
+                console.error('Failed to fetch courses', err);
+                if (mounted) setError(err.message || 'Failed to load courses');
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -38,7 +35,7 @@ export function Courses() {
         fetchCourses();
 
         // Refresh data on focus (Simple "React Query lite" behavior)
-        const onFocus = () => fetchCourses();
+        const onFocus = () => fetchCourses(true);
         window.addEventListener('focus', onFocus);
 
         return () => {
@@ -52,6 +49,16 @@ export function Courses() {
 
     if (loading) {
         return <div className="py-20 text-center text-gray-500">Loading courses...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="py-20 text-center">
+                <p className="text-red-500 text-lg mb-2">Error loading courses</p>
+                <p className="text-gray-500 text-sm">{error}</p>
+                <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+        );
     }
 
     return (

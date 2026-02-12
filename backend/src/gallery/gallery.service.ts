@@ -152,23 +152,34 @@ export class GalleryService {
         return Promise.all(images.map(img => this.signImage(img)));
     }
 
-    // Helper to generate Signed URL
+    // Helper to generate Signed URL (NOW REPLACED BY PROXY URL)
     private async signImage(image: GalleryImage) {
-        if (this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key') {
+        const isMock = this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key';
+        if (isMock) {
             return image;
         }
-        try {
-            const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
-            const { GetObjectCommand } = await import("@aws-sdk/client-s3");
 
-            const command = new GetObjectCommand({ Bucket: this.bucketName, Key: image.s3_key });
-            const url = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
-            image.public_url = url;
-            image.thumb_url = url;
-            return image;
-        } catch (e) {
-            console.error('Error signing URL for image:', image.id, e);
-            return image;
-        }
+        // Use Proxy URL instead of Signed URL to prevent expiration
+        const baseUrl = process.env.API_BASE_URL || 'https://api.aesciontech.com'; // Fallback to prod if env missing, or handle dynamically
+        // Use relative path or full path depending on if we want backend to be absolute
+        // It's safer to return a relative path if the frontend knows the base, but here we likely want full.
+        // Let's assume the frontend API client handles the base URL if we return a relative one? 
+        // No, the frontend displays these directly in <img> tags. So we need a full URL.
+
+        // Better: Construct URL based on current host if possible, or config. 
+        // For now, let's use the proxy route: /images/proxy/<key>
+
+        // We need to return a URL that the frontend can load.
+        // Since the frontend might separate API_URL, we should ideally prepend API_URL.
+        // However, we don't have access to the request host easily here without @Inject(REQUEST).
+        // Let's rely on a config variable for API_URL or just return the path and let frontend prepend?
+        // Existing logic returned a full string `https://${bucket}...`. 
+        // So we should return a full string.
+
+        const apiUrl = this.configService.get<string>('API_URL') || 'http://localhost:3000';
+        image.public_url = `${apiUrl}/images/proxy/${image.s3_key}`;
+        image.thumb_url = `${apiUrl}/images/proxy/${image.s3_key}`;
+
+        return image;
     }
 }

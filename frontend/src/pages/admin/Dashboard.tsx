@@ -6,7 +6,6 @@ import { gallery as galleryApi } from '../../api/gallery';
 import { popups as popupsApi } from '../../api/popups';
 import { analytics as analyticsApi } from '../../api/analytics';
 import { BookOpen, Image, Bell, TrendingUp, Globe, Briefcase, GraduationCap, Target } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 
 export function Dashboard() {
     const [stats, setStats] = useState({
@@ -20,9 +19,7 @@ export function Dashboard() {
         totalVisits: 0,
         uniqueVisitors: 0
     });
-    const [dailyVisits, setDailyVisits] = useState([]);
-    const [topPages, setTopPages] = useState([]);
-    const [sources, setSources] = useState([]);
+    // Charts removed
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -34,20 +31,14 @@ export function Dashboard() {
                     galleryData,
                     popupsData,
                     analyticsStats,
-                    dailyData,
-                    topPagesData,
-                    conversionData,
-                    sourcesData
+                    conversionData
                 ] = await Promise.all([
                     coursesApi.getAll().catch(() => []),
                     enquiriesApi.getAll().catch(() => []),
                     galleryApi.getAll().catch(() => []),
                     popupsApi.getAll().catch(() => []),
                     analyticsApi.getStats().catch(() => ({ totalVisits: 0, uniqueVisitors: 0 })),
-                    analyticsApi.getDailyVisits().catch(() => []),
-                    analyticsApi.getTopPages().catch(() => []),
-                    analyticsApi.getConversions().catch(() => ({ conversionRate: 0, visitors: 0 })),
-                    analyticsApi.getSources().catch(() => [])
+                    analyticsApi.getConversions().catch(() => ({ conversionRate: 0, visitors: 0 }))
                 ]);
 
                 setStats({
@@ -62,9 +53,6 @@ export function Dashboard() {
                     uniqueVisitors: analyticsStats.uniqueVisitors,
                     conversionRate: conversionData.conversionRate
                 } as any);
-                setDailyVisits(dailyData);
-                setTopPages(topPagesData);
-                setSources(sourcesData);
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {
@@ -73,6 +61,8 @@ export function Dashboard() {
         };
 
         fetchStats();
+
+
     }, []);
 
     const StatCard = ({ title, value, subValue, icon: Icon, color }: any) => (
@@ -137,62 +127,7 @@ export function Dashboard() {
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Visitor Trends (Last 7 Days)</h2>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={dailyVisits}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-
-                <Card className="p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Top Pages</h2>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={topPages} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis type="number" />
-                                <YAxis dataKey="path" type="category" width={150} tick={{ fontSize: 12 }} />
-                                <Tooltip />
-                                <Bar dataKey="count" fill="#3b82f6" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-
-                <Card className="p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Enquiries by Source</h2>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={sources}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {sources.map((_: any, index: number) => (
-                                        <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-            </div>
+            {/* Analytics charts removed as per request */}
 
             {isAdminView && (
                 <>

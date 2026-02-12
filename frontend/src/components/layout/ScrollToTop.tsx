@@ -1,21 +1,31 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export function ScrollToTop() {
     const { pathname } = useLocation();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        // Disable browser's default scroll restoration to avoid conflicts
+        if (window.history.scrollRestoration !== 'manual') {
+            window.history.scrollRestoration = 'manual';
+        }
+
         // handle hash anchors if present
         const { hash } = window.location;
         if (hash) {
             const id = hash.replace('#', '');
-            const el = document.getElementById(id);
-            if (el) {
-                el.scrollIntoView({ behavior: 'auto', block: 'start' });
-                return;
-            }
+            // Small timeout to allow processing
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 0);
+            return;
         }
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+        // Immediate scroll to top
+        window.scrollTo(0, 0);
     }, [pathname]);
 
     return null;

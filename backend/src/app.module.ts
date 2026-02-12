@@ -22,6 +22,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 
 import { VisitorLog } from './analytics/entities/visitor-log.entity';
 import { SearchModule } from './search/search.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { SearchModule } from './search/search.module';
         };
       },
     }),
-    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule, AnalyticsModule, SearchModule
+    AuthModule, UsersModule, CoursesModule, GalleryModule, TestimonialsModule, EnquiriesModule, PopupsModule, MailModule, AnalyticsModule, SearchModule, ImagesModule
   ],
   controllers: [AppController],
   providers: [AppService],
