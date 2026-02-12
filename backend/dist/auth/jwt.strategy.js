@@ -19,11 +19,8 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get('JWT_SECRET') || '',
+            secretOrKey: configService.getOrThrow('JWT_SECRET'),
         });
-        if (!configService.get('JWT_SECRET')) {
-            throw new Error('JWT_SECRET is not defined in environment variables');
-        }
     }
     async validate(payload) {
         return { userId: payload.sub, username: payload.username, role: payload.role };

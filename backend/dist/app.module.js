@@ -60,7 +60,7 @@ exports.AppModule = AppModule = __decorate([
                         database: config.get('DB_DATABASE'),
                         entities: [user_entity_1.User, course_entity_1.Course, gallery_entity_1.GalleryImage, testimonial_entity_1.Testimonial, enquiry_entity_1.Enquiry, popup_entity_1.Popup, visitor_log_entity_1.VisitorLog],
                         synchronize: config.get('NODE_ENV') !== 'production',
-                        ssl: config.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+                        ssl: config.get('NODE_ENV') === 'production' ? { rejectUnauthorized: true } : false,
                     };
                 },
             }),

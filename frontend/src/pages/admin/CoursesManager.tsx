@@ -70,9 +70,10 @@ export function CoursesManager() {
             setEditingCourse(null);
             reset({});
             fetchCourses();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save course', error);
-            alert('Failed to save course');
+            const msg = error.response?.data?.message || error.message || 'Failed to save course';
+            alert(`Failed to save course: ${Array.isArray(msg) ? msg.join(', ') : msg}`);
         }
     };
 
@@ -107,7 +108,7 @@ export function CoursesManager() {
                             <Input label="Duration" {...register('duration', { required: true })} required />
                             <Input label="Fees" {...register('fees', { required: true })} required />
                             <Input label="Mode" {...register('mode', { required: true })} required />
-                            <Input label="Image URL (Public URL)" {...register('image_url')} placeholder="https://..." />
+                            {/* <Input label="Image URL (Public URL)" {...register('image_url')} placeholder="https://..." /> */}
                         </div>
 
                         <div className="space-y-2">

@@ -115,7 +115,9 @@ export function FeaturedCourse() {
                             <div className="bg-[#0d0d0d] p-8 text-sm font-mono text-gray-300 leading-relaxed overflow-x-auto min-h-[200px] flex items-center">
                                 {course.code_snippet ? (
                                     <pre className="m-0 bg-transparent w-full" style={{ background: "#0d0d0d" }}>
-                                        <code className="language-javascript" dangerouslySetInnerHTML={{ __html: course.code_snippet }} />
+                                        <code className="language-javascript">
+                                            {course.code_snippet}
+                                        </code>
                                     </pre>
                                 ) : (
                                     <div className="text-center w-full">

@@ -19,6 +19,8 @@ const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const user_entity_1 = require("../users/entities/user.entity");
+const create_course_dto_1 = require("./dto/create-course.dto");
+const update_course_dto_1 = require("./dto/update-course.dto");
 let CoursesController = class CoursesController {
     coursesService;
     constructor(coursesService) {
@@ -49,7 +51,7 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.STAFF),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_course_dto_1.CreateCourseDto]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "create", null);
 __decorate([
@@ -76,7 +78,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, update_course_dto_1.UpdateCourseDto]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "update", null);
 __decorate([

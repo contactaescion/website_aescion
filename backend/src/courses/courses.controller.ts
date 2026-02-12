@@ -5,6 +5,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 
 @Controller('courses')
 export class CoursesController {
@@ -13,7 +15,7 @@ export class CoursesController {
     @Post()
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
-    create(@Body() createCourseDto: Partial<Course>) {
+    create(@Body() createCourseDto: CreateCourseDto) {
         return this.coursesService.create(createCourseDto);
     }
 
@@ -37,7 +39,7 @@ export class CoursesController {
     @Patch(':id')
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
-    update(@Param('id') id: string, @Body() updateCourseDto: Partial<Course>) {
+    update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
         return this.coursesService.update(+id, updateCourseDto);
     }
 

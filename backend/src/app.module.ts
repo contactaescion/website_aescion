@@ -48,8 +48,8 @@ import { ImagesModule } from './images/images.module';
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_DATABASE'),
           entities: [User, Course, GalleryImage, Testimonial, Enquiry, Popup, VisitorLog],
-          synchronize: config.get<string>('NODE_ENV') !== 'production',
-          ssl: config.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+          synchronize: config.get<string>('NODE_ENV') !== 'production', // Disable sync in production
+          ssl: config.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: true } : false, // Enforce SSL in production
         };
       },
     }),

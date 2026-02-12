@@ -23,14 +23,14 @@ export function AdminLayout() {
             items: [
                 { icon: BookOpen, label: 'Courses', href: '/admin/courses', roles: ['SUPER_ADMIN', 'STAFF'] },
                 { icon: Image, label: 'Gallery', href: '/admin/gallery', roles: ['SUPER_ADMIN', 'STAFF'] },
-                { icon: Users, label: 'Training Enquiries', href: '/admin/enquiries?type=TRAINING', roles: ['SUPER_ADMIN', 'STAFF'] },
+                { icon: Users, label: 'Enquiries', href: '/admin/enquiries?type=TRAINING', roles: ['SUPER_ADMIN', 'STAFF'] },
                 { icon: LayoutDashboard, label: 'Popups', href: '/admin/popups', roles: ['SUPER_ADMIN', 'STAFF'] },
             ]
         },
         {
             category: 'Recruitment',
             items: [
-                { icon: Users, label: 'Employer Enquiries', href: '/admin/enquiries?type=HR', roles: ['SUPER_ADMIN', 'HR'] },
+                // { icon: Users, label: 'Employer Enquiries', href: '/admin/enquiries?type=HR', roles: ['SUPER_ADMIN', 'HR'] },
                 // { icon: FileText, label: 'Job Requests', href: '/admin/jobs', roles: ['SUPER_ADMIN', 'HR'] }, // Placeholder
             ]
         },

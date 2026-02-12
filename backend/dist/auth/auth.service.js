@@ -101,7 +101,6 @@ let AuthService = class AuthService {
         }
     }
     async forgotPassword(email) {
-        console.log(`Attempting forgotPassword for: ${email}`);
         const user = await this.usersService.findOneByEmail(email);
         if (!user) {
             console.error(`User not found for email: ${email}`);
@@ -113,7 +112,6 @@ let AuthService = class AuthService {
         await this.usersService.save(user);
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const resetLink = `${frontendUrl}/admin/reset-password?token=${token}`;
-        console.log(`Generated reset link: ${resetLink}`);
         try {
             await this.mailService.sendPasswordResetEmail(user.email, resetLink);
         }

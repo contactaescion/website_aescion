@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     async forgotPassword(email: string) {
-        console.log(`Attempting forgotPassword for: ${email}`);
+        // console.log(`Attempting forgotPassword for: ${email}`); // Removed for security (PII/Log noise)
         const user = await this.usersService.findOneByEmail(email);
         if (!user) {
             console.error(`User not found for email: ${email}`);
@@ -72,7 +72,7 @@ export class AuthService {
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const resetLink = `${frontendUrl}/admin/reset-password?token=${token}`;
-        console.log(`Generated reset link: ${resetLink}`);
+        // REMOVED sensitive log: console.log(`Generated reset link: ${resetLink}`);
 
         try {
             await this.mailService.sendPasswordResetEmail(user.email, resetLink);

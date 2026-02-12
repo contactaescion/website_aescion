@@ -23,9 +23,9 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Increase body limit for large images
-  app.useBodyParser('json', { limit: '50mb' });
-  app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
+  // Increase body limit for large images (Reduced to 5mb to prevent DoS)
+  app.useBodyParser('json', { limit: '5mb' });
+  app.useBodyParser('urlencoded', { limit: '5mb', extended: true });
 
   // Security Headers
   app.use(helmet({
@@ -47,7 +47,7 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
+      max: 1000, // limit each IP to 1000 requests per windowMs (Increased for gallery proxy)
       standardHeaders: true,
       legacyHeaders: false,
     }),

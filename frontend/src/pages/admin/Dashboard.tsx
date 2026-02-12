@@ -5,7 +5,7 @@ import { enquiries as enquiriesApi } from '../../api/enquiries';
 import { gallery as galleryApi } from '../../api/gallery';
 import { popups as popupsApi } from '../../api/popups';
 import { analytics as analyticsApi } from '../../api/analytics';
-import { BookOpen, Image, Bell, TrendingUp, Globe, Briefcase, GraduationCap, Target } from 'lucide-react';
+import { BookOpen, Image, Bell, Briefcase, GraduationCap } from 'lucide-react';
 
 export function Dashboard() {
     const [stats, setStats] = useState({
@@ -88,6 +88,7 @@ export function Dashboard() {
             <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                {/* Visitor stats removed as per request
                 <StatCard
                     title="Total Visitors"
                     value={stats.totalVisits}
@@ -100,6 +101,7 @@ export function Dashboard() {
                     icon={Globe}
                     color="bg-teal-500"
                 />
+                */}
                 {isTrainingView && (
                     <StatCard
                         title="Training Leads"
@@ -118,6 +120,7 @@ export function Dashboard() {
                         color="bg-purple-500"
                     />
                 )}
+                {/*
                 <StatCard
                     title="Conversion Rate"
                     value={`${(stats as any).conversionRate || 0}%`}
@@ -125,6 +128,7 @@ export function Dashboard() {
                     color="bg-rose-500"
                     subValue="Enquiries / Unique Visitors"
                 />
+                */}
             </div>
 
             {/* Analytics charts removed as per request */}

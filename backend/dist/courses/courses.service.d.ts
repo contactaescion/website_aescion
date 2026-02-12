@@ -1,9 +1,11 @@
 import { Repository } from 'typeorm';
 import { Course } from './entities/course.entity';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 export declare class CoursesService {
     private coursesRepository;
     constructor(coursesRepository: Repository<Course>);
-    create(createCourseDto: Partial<Course>): Promise<Course>;
+    create(createCourseDto: CreateCourseDto): Promise<Course>;
     findAll(): Promise<Course[]>;
     findAllPaginated(options: {
         page: number;
@@ -17,7 +19,7 @@ export declare class CoursesService {
         pageSize: number;
     }>;
     findOne(id: number): Promise<Course>;
-    update(id: number, updateCourseDto: Partial<Course>): Promise<Course>;
+    update(id: number, updateCourseDto: UpdateCourseDto): Promise<Course>;
     remove(id: number): Promise<{
         deleted: boolean;
     }>;
