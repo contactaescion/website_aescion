@@ -1,0 +1,44 @@
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Building Frontend
+        run: |
+            cd frontend
+            npm install
+            npm run build
+
+      - name: Building Backend
+        run: |
+            cd backend
+            npm install
+            npm run build
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/aescion
+            git pull
+            cd frontend && npm install && npm run build && cd ..
+            cd backend && npm install && npm run build && cd ..
+            pm2 restart aescion-backend
