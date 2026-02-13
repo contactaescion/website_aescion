@@ -111,4 +111,27 @@ Go to the **Actions** tab in GitHub to watch the deployment proceed.
 ## Troubleshooting
 -   **Backend Logs:** `pm2 logs aescion-backend`
 -   **Nginx Logs:** `sudo tail -f /var/log/nginx/error.log`
--   **Permissions:** If deployment fails, ensure the ubuntu user owns the `~/app` directory.
+
+## 8. How to Get Your Keys (FAQ)
+
+### AWS Access Keys (for S3)
+To allow your backend to save images to your S3 bucket, you need an **IAM User**.
+1.  Log in to the **AWS Console**.
+2.  Search for **IAM** and go to the service.
+3.  Click **Users** -> **Create user**.
+4.  Name it `aescion-backend-user`.
+5.  **Permissions**: Select "Attach policies directly".
+6.  Search for `AmazonS3FullAccess` and select it. (For better security, you can create a custom policy for just your bucket, but this is easiest for now).
+7.  Create the user.
+8.  Click on the new user -> **Security credentials** tab.
+9.  Scroll to **Access keys** -> **Create access key**.
+10. Select **Application running outside AWS** -> Next.
+11. Copy the **Access Key ID** and **Secret Access Key**.
+12. **Paste these into your server's `.env` file.**
+
+### JWT Secret
+This is just a password used to secure user sessions.
+-   You can type any random long string.
+-   Example: `my-super-secure-secret-key-2026`
+-   You can generate one in terminal: `openssl rand -hex 32`
+
