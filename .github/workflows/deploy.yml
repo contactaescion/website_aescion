@@ -50,6 +50,9 @@ jobs:
           source: "frontend/dist,backend/dist,backend/package.json,backend/package-lock.json,backend/.env.production.example"
           target: "/home/${{ secrets.EC2_USERNAME }}/app"
           strip_components: 0
+          rm: true
+          # Exclude heavy folders that shouldn't be copied
+          tar_tmp_path: true
 
       - name: Execute Remote Commands
         uses: appleboy/ssh-action@v1.0.3
