@@ -60,21 +60,26 @@ jobs:
           script: |
             # 1. Setup Backend
             cd /home/${{ secrets.EC2_USERNAME }}/app/backend
-            npm ci --production
+            # Install ALL dependencies to avoid missing build tools or cli
+            npm ci 
             
-            # Start/Restart with PM2
-            # Check if process exists
+            # Start/Restart with PM2 (using sudo to ensure global pm2 access if needed, though user mode is better)
+            # We stick to user mode for PM2 as it's installed for the user usually.
+            
             if pm2 list | grep -q "aescion-backend"; then
               pm2 reload aescion-backend
             else
               pm2 start dist/main.js --name "aescion-backend" --env production
             fi
+            pm2 save
             
             # 2. Setup Frontend (Move to Nginx web root)
-            # Ensure folder exists
             sudo mkdir -p /var/www/html/aescion
             
-            # Copy build files (sudo needed for /var/www)
+            # Remove old files to prevent stale artifacts
+            sudo rm -rf /var/www/html/aescion/*
+            
+            # Copy build files
             sudo cp -r /home/${{ secrets.EC2_USERNAME }}/app/frontend/dist/* /var/www/html/aescion/
             
             # Fix permissions
