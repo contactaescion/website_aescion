@@ -59,7 +59,20 @@ export function CoursesManager() {
     const onSubmit = async (data: any) => {
         try {
             if (editingCourse) {
-                await coursesApi.update(editingCourse.id, data);
+                // Sanitize data to only include UpdateCourseDto fields
+                // We exclude system fields like id, created_at, updated_at that might be in data if form was reset with full object
+                // or if react-hook-form includes them.
+                // Explicitly picking fields ensures we don't send forbidsNonWhitelisted fields.
+                const updateData = {
+                    title: data.title,
+                    duration: data.duration,
+                    fees: data.fees,
+                    mode: data.mode,
+                    code_snippet: data.code_snippet,
+                    // Add other fields if they are in the form, e.g. placement_support, is_featured
+                    // For now, these seem to be the ones in the form inputs.
+                };
+                await coursesApi.update(editingCourse.id, updateData);
             } else {
                 await coursesApi.create({
                     ...data,
