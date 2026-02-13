@@ -7,7 +7,7 @@ You are seeing "500 Internal Server Error" because your server might be missing 
 
 **You MUST add these 3 secrets in GitHub -> Settings -> Secrets and variables -> Actions:**
 1.  **Name:** `EC2_HOST`
-    *   **Value:** `13.49.75.255`
+    *   **Value:** `13.60.9.145`
 2.  **Name:** `EC2_USERNAME`
     *   **Value:** `ubuntu`
 3.  **Name:** `EC2_SSH_KEY`
@@ -18,7 +18,7 @@ You are seeing "500 Internal Server Error" because your server might be missing 
 ## Phase 2: Server Cleanup & Setup
 SSH into your server:
 ```bash
-ssh -i "path/to/aesciontech-key.pem" ubuntu@13.49.75.255
+ssh -i "aesciontech-key.pem" ubuntu@13.60.9.145
 ```
 
 Running these commands helps ensure a clean state:
