@@ -1,0 +1,86 @@
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # --- Frontend Build ---
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          VITE_API_URL: /api
+
+      # --- Backend Build ---
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
+      # --- Deployment ---
+      - name: Deploy to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: "frontend/dist,backend/dist,backend/package.json,backend/package-lock.json,backend/.env.production.example"
+          target: "/home/${{ secrets.EC2_USERNAME }}/app"
+          strip_components: 0
+
+      - name: Execute Remote Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # 1. Setup Backend
+            cd /home/${{ secrets.EC2_USERNAME }}/app/backend
+            npm ci --production
+            
+            # Start/Restart with PM2
+            # Check if process exists
+            if pm2 list | grep -q "aescion-backend"; then
+              pm2 reload aescion-backend
+            else
+              pm2 start dist/main.js --name "aescion-backend" --env production
+            fi
+            
+            # 2. Setup Frontend (Move to Nginx web root)
+            # Ensure folder exists
+            sudo mkdir -p /var/www/html/aescion
+            
+            # Copy build files (sudo needed for /var/www)
+            sudo cp -r /home/${{ secrets.EC2_USERNAME }}/app/frontend/dist/* /var/www/html/aescion/
+            
+            # Fix permissions
+            sudo chown -R www-data:www-data /var/www/html/aescion
+            
+            # 3. Reload Nginx
+            sudo systemctl reload nginx
+            
+            echo "Deployment Complete!"

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiEnv = import.meta.env.VITE_API_URL || import.meta.env.VITE_PUBLIC_API_URL;
-const baseURL = apiEnv ? (apiEnv.startsWith('http') ? apiEnv : `https://${apiEnv}`) : 'http://localhost:3000';
+const baseURL = apiEnv ? (apiEnv.startsWith('http') || apiEnv.startsWith('/') ? apiEnv : `https://${apiEnv}`) : 'http://localhost:3000';
 
 const client = axios.create({
     baseURL,
