@@ -10,6 +10,8 @@ ssh -i "path/to/aesciontech-key.pem" ubuntu@13.49.75.255
 ## 2. Edit .env File
 ```bash
 nano ~/app/backend/.env
+
+
 ```
 
 ## 3. Add FRONTEND_URL
