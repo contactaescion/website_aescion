@@ -4,7 +4,7 @@ Since this is a fresh deployment, your database is empty. You need to run the **
 
 ## 1. SSH into your Server
 ```bash
-ssh -i "path/to/aesciontech-key.pem" ubuntu@13.49.75.255
+ssh -i "path/to/aesciontech-key.pem" ubuntu@13.60.9.145
 ```
 
 ## 2. Navigate to the Backend Directory

@@ -4,7 +4,7 @@ The reason your password reset link says `localhost` is that we missed one envir
 
 ## 1. SSH into Server
 ```bash
-ssh -i "path/to/aesciontech-key.pem" ubuntu@13.49.75.255
+ssh -i "path/to/aesciontech-key.pem" ubuntu@13.60.9.145
 ```
 
 ## 2. Edit .env File
