@@ -6,7 +6,7 @@ const db = new sqlite3.Database(dbPath);
 
 const targetEmail = 'contact.aescion@gmail.com';
 // Typo handling: user might have typed it wrong in DB previously or we want to fix any 'admin@aescion.com'
-const oldEmails = ['admin@aescion.com', 'contact.aescio@gmail.com'];
+const oldEmails = ['info@aesciontech.com', 'contact.aescion@gmail.com'];
 
 db.serialize(() => {
     // 1. Check if target exists
