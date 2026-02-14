@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { enquiries, type Enquiry } from '../../api/enquiries';
 import { users, type User } from '../../api/users';
-import { Mail, Phone, Calendar, User as UserIcon, Search, Filter, Briefcase, GraduationCap } from 'lucide-react';
+import { Mail, Phone, Calendar, User as UserIcon, Search, Filter, Briefcase, GraduationCap, Trash2 } from 'lucide-react';
 
 export function EnquiriesManager() {
     const [list, setList] = useState<Enquiry[]>([]);
@@ -65,6 +65,17 @@ export function EnquiriesManager() {
         } catch (error) {
             console.error('Failed to add note', error);
             alert('Failed to add note');
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this enquiry? This action cannot be undone.')) return;
+        try {
+            await enquiries.delete(id);
+            setList(list.filter(e => e.id !== id));
+        } catch (error) {
+            console.error('Failed to delete enquiry', error);
+            alert('Failed to delete enquiry');
         }
     };
 
@@ -252,12 +263,21 @@ export function EnquiriesManager() {
                                             </select>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button
-                                                onClick={() => setSelectedEnquiry(enquiry)}
-                                                className="text-brand-blue hover:text-blue-700 text-sm font-medium"
-                                            >
-                                                Notes {enquiry.notes && enquiry.notes.length > 0 && `(${enquiry.notes.length})`}
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setSelectedEnquiry(enquiry)}
+                                                    className="text-brand-blue hover:text-blue-700 text-sm font-medium"
+                                                >
+                                                    Notes {enquiry.notes && enquiry.notes.length > 0 && `(${enquiry.notes.length})`}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(enquiry.id)}
+                                                    className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50"
+                                                    title="Delete Enquiry"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

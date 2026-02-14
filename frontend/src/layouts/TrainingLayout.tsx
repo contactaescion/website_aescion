@@ -1,7 +1,7 @@
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { Outlet, useLocation } from 'react-router-dom';
-import { MarketingPopup } from '../components/common/MarketingPopup';
+import { PopupOverlay } from '../components/common/PopupOverlay';
 import { useEffect } from 'react';
 
 export function TrainingLayout() {
@@ -29,7 +29,7 @@ export function TrainingLayout() {
 
     return (
         <div className="min-h-screen bg-white">
-            <MarketingPopup />
+            <PopupOverlay type="TRAINING" />
             <Navbar links={links} />
             <main>
                 <Outlet />

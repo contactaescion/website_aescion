@@ -23,9 +23,9 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Increase body limit for large images (Reduced to 5mb to prevent DoS)
-  app.useBodyParser('json', { limit: '5mb' });
-  app.useBodyParser('urlencoded', { limit: '5mb', extended: true });
+  // Increase body limit for large images
+  app.useBodyParser('json', { limit: '50mb' });
+  app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
 
   // Security Headers
   app.use(helmet({

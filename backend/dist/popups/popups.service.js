@@ -72,53 +72,61 @@ let PopupsService = class PopupsService {
         });
         this.bucketName = this.configService.get('AWS_S3_BUCKET') || 'aescion-gallery';
     }
-    async create(file, title) {
-        if (!file)
-            throw new common_1.BadRequestException('No file uploaded');
-        const key = `popups/${(0, uuid_1.v4)()}-${file.originalname}`;
-        const isMock = this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key';
-        let publicUrl = '';
-        if (isMock) {
-            const uploadDir = path.join(process.cwd(), 'uploads');
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir);
+    async create(file, title, type = 'TRAINING') {
+        try {
+            if (!file)
+                throw new common_1.BadRequestException('No file uploaded');
+            const key = `popups/${(0, uuid_1.v4)()}-${file.originalname}`;
+            const isMock = this.configService.get('AWS_ACCESS_KEY_ID') === 'mock_key';
+            let publicUrl = '';
+            if (isMock) {
+                const uploadDir = path.join(process.cwd(), 'uploads');
+                if (!fs.existsSync(uploadDir)) {
+                    fs.mkdirSync(uploadDir);
+                }
+                const fileName = `${(0, uuid_1.v4)()}-${file.originalname}`;
+                const filePath = path.join(uploadDir, fileName);
+                fs.writeFileSync(filePath, file.buffer);
+                const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+                publicUrl = `${baseUrl}/uploads/${fileName}`;
             }
-            const fileName = `${(0, uuid_1.v4)()}-${file.originalname}`;
-            const filePath = path.join(uploadDir, fileName);
-            fs.writeFileSync(filePath, file.buffer);
-            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
-            publicUrl = `${baseUrl}/uploads/${fileName}`;
+            else {
+                await this.s3Client.send(new client_s3_1.PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                }));
+                const apiUrl = this.configService.get('API_URL') || 'http://localhost:3000';
+                publicUrl = `${apiUrl}/images/proxy/${key}`;
+            }
+            const popup = this.popupsRepository.create({
+                title,
+                type,
+                image_url: publicUrl,
+                s3_key: key,
+                is_active: false
+            });
+            return this.popupsRepository.save(popup);
         }
-        else {
-            await this.s3Client.send(new client_s3_1.PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-                ACL: 'public-read',
-            }));
-            publicUrl = `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${key}`;
+        catch (error) {
+            console.error('Popup Create Error:', error);
+            throw error;
         }
-        const popup = this.popupsRepository.create({
-            title,
-            image_url: publicUrl,
-            s3_key: key,
-            is_active: false
-        });
-        return this.popupsRepository.save(popup);
     }
     findAll() {
         return this.popupsRepository.find({ order: { created_at: 'DESC' } });
     }
     async findActive() {
-        return this.popupsRepository.findOne({ where: { is_active: true } });
+        return this.popupsRepository.find({ where: { is_active: true } });
     }
     async toggleActive(id) {
         const popup = await this.popupsRepository.findOne({ where: { id } });
         if (!popup)
             throw new common_1.NotFoundException('Popup not found');
         if (!popup.is_active) {
-            await this.popupsRepository.update({ is_active: true }, { is_active: false });
+            const type = popup.type || 'TRAINING';
+            await this.popupsRepository.update({ is_active: true, type }, { is_active: false });
         }
         popup.is_active = !popup.is_active;
         return this.popupsRepository.save(popup);

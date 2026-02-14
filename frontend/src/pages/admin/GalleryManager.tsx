@@ -11,7 +11,8 @@ export function GalleryManager() {
     const [images, setImages] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     const [editingImage, setEditingImage] = useState<any>(null);
-    const { register, handleSubmit, reset, setValue } = useForm();
+    const { register, handleSubmit, reset, setValue, watch } = useForm();
+    const selectedFile = watch('file');
     const token = sessionStorage.getItem('access_token');
 
     const fetchImages = async () => {
@@ -161,9 +162,15 @@ export function GalleryManager() {
                         {!editingImage && (
                             <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg text-center bg-white cursor-pointer hover:border-brand-blue transition-colors">
                                 <input type="file" {...register('file')} className="hidden" id="file-upload" />
-                                <label htmlFor="file-upload" className="cursor-pointer">
+                                <label htmlFor="file-upload" className="cursor-pointer w-full block">
                                     <UploadCloud className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                                    <p className="text-sm text-gray-500">Click to select images</p>
+                                    <p className="text-sm text-gray-500">
+                                        {selectedFile && selectedFile.length > 0 ? (
+                                            <span className="text-brand-blue font-medium">Selected: {selectedFile[0].name}</span>
+                                        ) : (
+                                            "Click to select images"
+                                        )}
+                                    </p>
                                 </label>
                             </div>
                         )}

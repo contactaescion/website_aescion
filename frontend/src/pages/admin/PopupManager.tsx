@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, CheckCircle, Eye } from 'lucide-react';
+import { Plus, Trash2, CheckCircle, Eye, GraduationCap, Briefcase, Home } from 'lucide-react';
 import { Button, buttonVariants } from '../../components/ui-kit/Button';
 import { Card } from '../../components/ui-kit/Card';
 import { client } from '../../api/client';
@@ -11,12 +11,27 @@ interface Popup {
     image_url: string;
     is_active: boolean;
     created_at: string;
+    type?: 'TRAINING' | 'HR' | 'HOME';
 }
 
 export function PopupManager() {
     const [popups, setPopups] = useState<Popup[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [activeTab, setActiveTab] = useState<'TRAINING' | 'HR' | 'HOME'>('TRAINING');
+
+    const TabButton = ({ tab, label, icon: Icon }: any) => (
+        <button
+            onClick={() => setActiveTab(tab)}
+            className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 ${activeTab === tab
+                ? 'border-brand-blue text-brand-blue bg-blue-50/50'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+        >
+            <Icon className="w-4 h-4" />
+            {label}
+        </button>
+    );
 
     useEffect(() => {
         fetchPopups();
@@ -40,6 +55,7 @@ export function PopupManager() {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', file.name.split('.')[0]); // Default title from filename
+        formData.append('type', activeTab);
 
         setUploading(true);
         try {
@@ -97,14 +113,21 @@ export function PopupManager() {
                         })}
                     >
                         <Plus className="w-4 h-4 mr-2" />
-                        {uploading ? 'Uploading...' : 'Add New Popup'}
+                        {uploading ? 'Uploading...' : `Add ${activeTab === 'HR' ? 'Recruitment' : activeTab === 'HOME' ? 'Main Home' : 'Training'} Popup`}
                     </label>
                 </div>
             </div>
 
+            {/* Tabs */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 flex overflow-hidden w-fit">
+                <TabButton tab="TRAINING" label="Training" icon={GraduationCap} />
+                <TabButton tab="HR" label="Recruitment" icon={Briefcase} />
+                <TabButton tab="HOME" label="Main Home" icon={Home} />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <AnimatePresence>
-                    {popups.map((popup) => (
+                    {popups.filter(p => (p.type || 'TRAINING') === activeTab).map((popup) => (
                         <motion.div
                             key={popup.id}
                             initial={{ opacity: 0, scale: 0.9 }}
@@ -160,9 +183,9 @@ export function PopupManager() {
                     ))}
                 </AnimatePresence>
 
-                {popups.length === 0 && (
+                {popups.filter(p => (p.type || 'TRAINING') === activeTab).length === 0 && (
                     <div className="col-span-full py-12 text-center text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                        No popups found. Upload one to get started.
+                        No {activeTab === 'HR' ? 'recruitment' : activeTab === 'HOME' ? 'main home' : 'training'} popups found. Upload one to get started.
                     </div>
                 )}
             </div>

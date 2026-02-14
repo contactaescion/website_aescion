@@ -7,9 +7,9 @@ export declare class PopupsService {
     private s3Client;
     private bucketName;
     constructor(popupsRepository: Repository<Popup>, configService: ConfigService);
-    create(file: Express.Multer.File, title: string): Promise<Popup>;
+    create(file: Express.Multer.File, title: string, type?: string): Promise<Popup>;
     findAll(): Promise<Popup[]>;
-    findActive(): Promise<Popup | null>;
+    findActive(): Promise<Popup[]>;
     toggleActive(id: number): Promise<Popup>;
     remove(id: number): Promise<Popup>;
 }

@@ -23,3 +23,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Build logs
+*.txt
+build_*.txt
+build_log*.txt
+build_err.txt

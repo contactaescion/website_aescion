@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Patch, ParseFilePipe, MaxFileSizeValidator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PopupsService } from './popups.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,10 +15,19 @@ export class PopupsController {
     @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
     @UseInterceptors(FileInterceptor('file'))
     create(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // 20MB
+                    // new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp)' }), // Optional, open for now
+                ],
+            }),
+        )
+        file: Express.Multer.File,
         @Body('title') title: string,
+        @Body('type') type: string,
     ) {
-        return this.popupsService.create(file, title);
+        return this.popupsService.create(file, title, type);
     }
 
     @Get()

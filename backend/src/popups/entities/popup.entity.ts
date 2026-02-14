@@ -11,6 +11,9 @@ export class Popup {
     @Column()
     image_url: string;
 
+    @Column({ default: 'TRAINING' })
+    type: string; // 'TRAINING' | 'HR' | 'HOME'
+
     @Column({ default: false })
     is_active: boolean;
 

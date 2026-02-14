@@ -36,5 +36,9 @@ export const enquiries = {
     addNote: async (id: number, note: string) => {
         const response = await client.post(`/enquiries/${id}/notes`, { note });
         return response.data;
+    },
+    delete: async (id: number) => {
+        const response = await client.delete(`/enquiries/${id}`);
+        return response.data;
     }
 };

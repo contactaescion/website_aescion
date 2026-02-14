@@ -3,6 +3,8 @@ import { Footer } from '../components/layout/Footer';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
+import { PopupOverlay } from '../components/common/PopupOverlay';
+
 export function LandingLayout() {
     const links = [
         { name: 'Home', href: '/' },
@@ -33,6 +35,7 @@ export function LandingLayout() {
             <main>
                 <Outlet />
             </main>
+            <PopupOverlay type="HOME" />
             <Footer />
         </div>
     );

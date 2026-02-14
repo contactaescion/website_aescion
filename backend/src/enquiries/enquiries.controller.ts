@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, UseGuards, Param } from '@nestjs/common';
 import { EnquiriesService } from './enquiries.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -40,5 +40,12 @@ export class EnquiriesController {
     @Roles(UserRole.SUPER_ADMIN, UserRole.STAFF)
     addNote(@Body() body: { note: string }, @Param('id') id: number) {
         return this.service.addNote(id, body.note);
+    }
+
+    @Delete(':id')
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(UserRole.SUPER_ADMIN)
+    remove(@Param('id') id: number) {
+        return this.service.remove(id);
     }
 }

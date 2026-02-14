@@ -55,6 +55,10 @@ let EnquiriesService = class EnquiriesService {
         await this.repo.update(id, { notes });
         return this.repo.findOne({ where: { id } });
     }
+    async remove(id) {
+        await this.repo.delete(id);
+        return { deleted: true };
+    }
 };
 exports.EnquiriesService = EnquiriesService;
 exports.EnquiriesService = EnquiriesService = __decorate([

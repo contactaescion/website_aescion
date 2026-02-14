@@ -3,6 +3,8 @@ import { Footer } from '../components/layout/Footer';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
+import { PopupOverlay } from '../components/common/PopupOverlay';
+
 export function RecruitmentLayout() {
     const links = [
         { name: 'Home', href: '/' },
@@ -32,6 +34,7 @@ export function RecruitmentLayout() {
             <main>
                 <Outlet />
             </main>
+            <PopupOverlay type="HR" />
             <Footer hideCourses={true} />
         </div>
     );

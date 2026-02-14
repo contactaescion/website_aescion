@@ -28,47 +28,57 @@ export class PopupsService {
         this.bucketName = this.configService.get<string>('AWS_S3_BUCKET') || 'aescion-gallery';
     }
 
-    async create(file: Express.Multer.File, title: string) {
-        if (!file) throw new BadRequestException('No file uploaded');
+    async create(file: Express.Multer.File, title: string, type: string = 'TRAINING') {
+        try {
+            if (!file) throw new BadRequestException('No file uploaded');
 
-        const key = `popups/${uuidv4()}-${file.originalname}`;
-        const isMock = this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key';
+            const key = `popups/${uuidv4()}-${file.originalname}`;
+            const isMock = this.configService.get<string>('AWS_ACCESS_KEY_ID') === 'mock_key';
 
-        let publicUrl = '';
+            let publicUrl = '';
 
-        if (isMock) {
-            // Save locally
-            const uploadDir = path.join(process.cwd(), 'uploads');
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir);
+            if (isMock) {
+                // Save locally
+                const uploadDir = path.join(process.cwd(), 'uploads');
+                if (!fs.existsSync(uploadDir)) {
+                    fs.mkdirSync(uploadDir);
+                }
+
+                const fileName = `${uuidv4()}-${file.originalname}`;
+                const filePath = path.join(uploadDir, fileName);
+                fs.writeFileSync(filePath, file.buffer);
+
+                const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+                publicUrl = `${baseUrl}/uploads/${fileName}`;
+            } else {
+                // Upload to S3
+                // FIXED: Removed ACL: 'public-read' to support private buckets with Block Public Access enabled
+                await this.s3Client.send(new PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                    // ACL: 'public-read', // REMOVED for security
+                }));
+
+                // FIXED: Use Proxy URL so backend serves the image securely
+                const apiUrl = this.configService.get<string>('API_URL') || 'http://localhost:3000';
+                publicUrl = `${apiUrl}/images/proxy/${key}`;
             }
 
-            const fileName = `${uuidv4()}-${file.originalname}`;
-            const filePath = path.join(uploadDir, fileName);
-            fs.writeFileSync(filePath, file.buffer);
+            const popup = this.popupsRepository.create({
+                title,
+                type,
+                image_url: publicUrl,
+                s3_key: key,
+                is_active: false // Default to inactive
+            });
 
-            const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
-            publicUrl = `${baseUrl}/uploads/${fileName}`;
-        } else {
-            // Upload to S3
-            await this.s3Client.send(new PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-                ACL: 'public-read',
-            }));
-            publicUrl = `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`;
+            return this.popupsRepository.save(popup);
+        } catch (error) {
+            console.error('Popup Create Error:', error);
+            throw error;
         }
-
-        const popup = this.popupsRepository.create({
-            title,
-            image_url: publicUrl,
-            s3_key: key,
-            is_active: false // Default to inactive
-        });
-
-        return this.popupsRepository.save(popup);
     }
 
     findAll() {
@@ -76,18 +86,17 @@ export class PopupsService {
     }
 
     async findActive() {
-        return this.popupsRepository.findOne({ where: { is_active: true } });
+        return this.popupsRepository.find({ where: { is_active: true } });
     }
 
     async toggleActive(id: number) {
         const popup = await this.popupsRepository.findOne({ where: { id } });
         if (!popup) throw new NotFoundException('Popup not found');
 
-        // If activating this one, deactivate others? 
-        // Or allowing multiple active? Usually one popup at a time.
-        // Let's enforce single active popup for simplicity.
+        // Allow only one active popup per type
         if (!popup.is_active) {
-            await this.popupsRepository.update({ is_active: true }, { is_active: false });
+            const type = popup.type || 'TRAINING';
+            await this.popupsRepository.update({ is_active: true, type }, { is_active: false });
         }
 
         popup.is_active = !popup.is_active;

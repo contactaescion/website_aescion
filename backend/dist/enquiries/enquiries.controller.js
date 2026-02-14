@@ -39,6 +39,9 @@ let EnquiriesController = class EnquiriesController {
     addNote(body, id) {
         return this.service.addNote(id, body.note);
     }
+    remove(id) {
+        return this.service.remove(id);
+    }
 };
 exports.EnquiriesController = EnquiriesController;
 __decorate([
@@ -86,6 +89,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", void 0)
 ], EnquiriesController.prototype, "addNote", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], EnquiriesController.prototype, "remove", null);
 exports.EnquiriesController = EnquiriesController = __decorate([
     (0, common_1.Controller)('enquiries'),
     __metadata("design:paramtypes", [enquiries_service_1.EnquiriesService])

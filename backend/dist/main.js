@@ -17,8 +17,8 @@ async function bootstrap() {
     app.use((0, compression_1.default)());
     app.use((0, cookie_parser_1.default)());
     const configService = app.get(config_1.ConfigService);
-    app.useBodyParser('json', { limit: '5mb' });
-    app.useBodyParser('urlencoded', { limit: '5mb', extended: true });
+    app.useBodyParser('json', { limit: '50mb' });
+    app.useBodyParser('urlencoded', { limit: '50mb', extended: true });
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: "cross-origin" },
     }));

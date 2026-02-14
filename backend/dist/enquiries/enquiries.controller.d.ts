@@ -13,4 +13,7 @@ export declare class EnquiriesController {
     addNote(body: {
         note: string;
     }, id: number): Promise<import("./entities/enquiry.entity").Enquiry | null>;
+    remove(id: number): Promise<{
+        deleted: boolean;
+    }>;
 }

@@ -15,6 +15,7 @@ let Popup = class Popup {
     id;
     title;
     image_url;
+    type;
     is_active;
     s3_key;
     created_at;
@@ -33,6 +34,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Popup.prototype, "image_url", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'TRAINING' }),
+    __metadata("design:type", String)
+], Popup.prototype, "type", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)

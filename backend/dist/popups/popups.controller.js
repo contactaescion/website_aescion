@@ -25,8 +25,8 @@ let PopupsController = class PopupsController {
     constructor(popupsService) {
         this.popupsService = popupsService;
     }
-    create(file, title) {
-        return this.popupsService.create(file, title);
+    create(file, title, type) {
+        return this.popupsService.create(file, title, type);
     }
     findAll() {
         return this.popupsService.findAll();
@@ -47,10 +47,15 @@ __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(user_entity_1.UserRole.SUPER_ADMIN, user_entity_1.UserRole.STAFF),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    __param(0, (0, common_1.UploadedFile)()),
+    __param(0, (0, common_1.UploadedFile)(new common_1.ParseFilePipe({
+        validators: [
+            new common_1.MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }),
+        ],
+    }))),
     __param(1, (0, common_1.Body)('title')),
+    __param(2, (0, common_1.Body)('type')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", void 0)
 ], PopupsController.prototype, "create", null);
 __decorate([
