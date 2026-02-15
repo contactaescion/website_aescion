@@ -1,16 +1,31 @@
-// import { Card } from '../ui-kit/Card';
-// import { EnquiryForm } from '../common/EnquiryForm';
+import { Card } from '../ui-kit/Card';
+import { EnquiryForm } from '../common/EnquiryForm';
 
 
 interface ContactProps {
     showMap?: boolean;
+    showForm?: boolean;
 }
 
-export function Contact({ showMap = true }: ContactProps) {
+export function Contact({ showMap = true, showForm = false }: ContactProps) {
     return (
         <section id="contact" className="py-10 bg-white" style={{ marginTop: "0px" }}>
             <div className="container mx-auto px-4 md:px-6">
-                {/* Enquiry Form Removed per user request */}
+                {showForm && (
+                    <div className="flex justify-center mb-16">
+                        {/* Enquiry Form */}
+                        <div className="w-full lg:w-[70%]">
+                            <div className="text-center mb-10">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Get In Touch</h2>
+                                <p className="text-gray-600">Have questions? We'd love to hear from you.</p>
+                            </div>
+                            <Card className="p-8 border-t-8 border-t-brand-blue">
+                                <h3 className="text-2xl font-bold mb-6">Send an Enquiry</h3>
+                                <EnquiryForm type="TRAINING" />
+                            </Card>
+                        </div>
+                    </div>
+                )}
 
                 {/* Google Map Embed - Full Width Below */}
                 {showMap && (

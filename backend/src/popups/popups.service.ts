@@ -52,16 +52,19 @@ export class PopupsService {
                 publicUrl = `${baseUrl}/uploads/${fileName}`;
             } else {
                 // Upload to S3
-                // FIXED: Removed ACL: 'public-read' to support private buckets with Block Public Access enabled
-                await this.s3Client.send(new PutObjectCommand({
-                    Bucket: this.bucketName,
-                    Key: key,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
-                    // ACL: 'public-read', // REMOVED for security
-                }));
+                try {
+                    await this.s3Client.send(new PutObjectCommand({
+                        Bucket: this.bucketName,
+                        Key: key,
+                        Body: file.buffer,
+                        ContentType: file.mimetype,
+                    }));
+                } catch (error) {
+                    console.error('S3 Popup Upload Error:', error);
+                    throw new Error(`S3 Popup Upload Failed: ${error.message}`);
+                }
 
-                // FIXED: Use Proxy URL so backend serves the image securely
+                // Use Proxy URL so backend serves the image securely
                 const apiUrl = this.configService.get<string>('API_URL') || 'http://localhost:3000';
                 publicUrl = `${apiUrl}/images/proxy/${key}`;
             }
