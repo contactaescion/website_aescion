@@ -16,7 +16,7 @@ export class ImagesController {
         this.bucketName = this.configService.get<string>('AWS_S3_BUCKET') || 'aescion-gallery';
 
         this.s3Client = new S3Client({
-            region: region || 'us-east-1',
+            region: region || 'eu-north-1',
             credentials: {
                 accessKeyId: accessKeyId || '',
                 secretAccessKey: secretAccessKey || '',

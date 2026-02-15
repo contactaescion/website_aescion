@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { GalleryImage, GalleryCategory } from './entities/gallery.entity';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -22,13 +23,17 @@ export class GalleryService {
         const bucket = this.configService.get<string>('AWS_S3_BUCKET');
 
         this.s3Client = new S3Client({
-            region: region || 'us-east-1',
+            region: region || 'eu-north-1',
             credentials: {
                 accessKeyId: accessKeyId || '',
                 secretAccessKey: secretAccessKey || '',
             },
         });
         this.bucketName = bucket || 'aescion-gallery';
+
+        if (!region || region !== 'eu-north-1') {
+            console.log(`[GalleryService] Initializing S3 with region: ${region || 'eu-north-1'}. Buckets in 'eu-north-1' require the correct region setting.`);
+        }
 
         if (!accessKeyId || !secretAccessKey) {
             console.warn('AWS credentials are not fully defined. S3 functionality might be limited.');
@@ -97,7 +102,7 @@ export class GalleryService {
             const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
             return `${baseUrl}/uploads/${key}`;
         }
-        const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+
         const command = new GetObjectCommand({ Bucket: this.bucketName, Key: key });
         const expiresIn = ttlSeconds || Number(this.configService.get<string>('S3_PRESIGN_TTL') || '3600');
         return await getSignedUrl(this.s3Client, command, { expiresIn });
