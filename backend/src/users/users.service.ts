@@ -19,7 +19,10 @@ export class UsersService {
             throw new Error('User already exists');
         }
 
-        const passwordRaw = createUserDto.password || 'default123';
+        if (!createUserDto.password) {
+            throw new Error('Password is required for user creation');
+        }
+        const passwordRaw = createUserDto.password;
         const hashedPassword = await bcrypt.hash(passwordRaw, 10);
 
         const user = this.usersRepository.create({

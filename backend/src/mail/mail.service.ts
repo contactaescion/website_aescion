@@ -8,14 +8,25 @@ export class MailService {
   private transporter: nodemailer.Transporter;
   private readonly logger = new Logger(MailService.name);
 
+  private isMockMode = false;
+
   constructor(private configService: ConfigService) {
+    let mailUser = this.configService.get<string>('MAIL_USER');
+    const mailPass = this.configService.get<string>('MAIL_PASS');
+
+    if (!mailUser || !mailPass || mailUser.includes('your_email') || mailPass === 'your_app_password') {
+      this.isMockMode = true;
+      if (!mailUser) mailUser = 'mock-admin@example.com';
+      this.logger.warn('Mail credentials not found or default. Email service will run in MOCK mode (logging emails to console).');
+    }
+
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true, // use SSL
       auth: {
-        user: this.configService.get<string>('MAIL_USER'),
-        pass: this.configService.get<string>('MAIL_PASS'),
+        user: mailUser,
+        pass: mailPass,
       },
     });
   }
@@ -58,6 +69,14 @@ export class MailService {
     };
 
     try {
+      if (this.isMockMode) {
+        const recipient = this.configService.get<string>('MAIL_USER') || 'mock-admin@example.com';
+        this.logger.log(`[MOCK EMAIL] To: ${recipient}`);
+        this.logger.log(`[MOCK EMAIL] Subject: ${mailOptions.subject}`);
+        this.logger.log(`[MOCK EMAIL] Content: ${dto.message}`);
+        return true;
+      }
+
       await this.transporter.sendMail(mailOptions);
       this.logger.log(`Enquiry notification email sent for: ${dto.name}`);
       return true;
@@ -81,6 +100,13 @@ export class MailService {
     };
 
     try {
+      if (this.isMockMode) {
+        this.logger.log(`[MOCK EMAIL] To: ${email}`);
+        this.logger.log(`[MOCK EMAIL] Subject: ${mailOptions.subject}`);
+        this.logger.log(`[MOCK EMAIL] Reset Link: ${resetLink}`);
+        return true;
+      }
+
       await this.transporter.sendMail(mailOptions);
       this.logger.log(`Reset email sent successfully to ${email}`);
       return true;

@@ -19,6 +19,7 @@ const typeorm_2 = require("typeorm");
 const gallery_entity_1 = require("./entities/gallery.entity");
 const config_1 = require("@nestjs/config");
 const client_s3_1 = require("@aws-sdk/client-s3");
+const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const uuid_1 = require("uuid");
 let GalleryService = class GalleryService {
     galleryRepository;
@@ -33,13 +34,16 @@ let GalleryService = class GalleryService {
         const secretAccessKey = this.configService.get('AWS_SECRET_ACCESS_KEY');
         const bucket = this.configService.get('AWS_S3_BUCKET');
         this.s3Client = new client_s3_1.S3Client({
-            region: region || 'us-east-1',
+            region: region || 'eu-north-1',
             credentials: {
                 accessKeyId: accessKeyId || '',
                 secretAccessKey: secretAccessKey || '',
             },
         });
         this.bucketName = bucket || 'aescion-gallery';
+        if (!region || region !== 'eu-north-1') {
+            console.log(`[GalleryService] Initializing S3 with region: ${region || 'eu-north-1'}. Buckets in 'eu-north-1' require the correct region setting.`);
+        }
         if (!accessKeyId || !secretAccessKey) {
             console.warn('AWS credentials are not fully defined. S3 functionality might be limited.');
         }
@@ -93,10 +97,9 @@ let GalleryService = class GalleryService {
             const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
             return `${baseUrl}/uploads/${key}`;
         }
-        const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
         const command = new client_s3_1.GetObjectCommand({ Bucket: this.bucketName, Key: key });
         const expiresIn = ttlSeconds || Number(this.configService.get('S3_PRESIGN_TTL') || '3600');
-        return await getSignedUrl(this.s3Client, command, { expiresIn });
+        return await (0, s3_request_presigner_1.getSignedUrl)(this.s3Client, command, { expiresIn });
     }
     async remove(id) {
         const image = await this.galleryRepository.findOne({ where: { id } });

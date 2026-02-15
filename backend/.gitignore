@@ -42,3 +42,7 @@ Thumbs.db
 
 # NestJS
 /dist/
+
+# Local Env Files
+*.sqlite
+database.sqlite

@@ -64,7 +64,8 @@ async function bootstrap() {
     }
     console.log('Courses seeded');
 
-    // Seed Gallery
+    // Seed Gallery - DISABLED per user request (only manual uploads allowed)
+    /*
     const galleryRepository = app.get('GalleryImageRepository'); // Accessing repo via string token might fail if not exported, better use getRepository
     // safer to use EntityManager or module reference if available, but let's try strict app.get first if we can inject a service or repo.
     // Actually, let's use the service if it has a create method for raw data, currently it expects file upload.
@@ -89,6 +90,7 @@ async function bootstrap() {
         }
     }
     console.log('Gallery seeded');
+    */
 
     await app.close();
 }

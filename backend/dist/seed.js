@@ -5,7 +5,6 @@ const app_module_1 = require("./app.module");
 const users_service_1 = require("./users/users.service");
 const courses_service_1 = require("./courses/courses.service");
 const user_entity_1 = require("./users/entities/user.entity");
-const gallery_entity_1 = require("./gallery/entities/gallery.entity");
 const course_entity_1 = require("./courses/entities/course.entity");
 const typeorm_1 = require("typeorm");
 async function bootstrap() {
@@ -58,24 +57,6 @@ async function bootstrap() {
         }
     }
     console.log('Courses seeded');
-    const galleryRepository = app.get('GalleryImageRepository');
-    const galleryRepo = dataSource.getRepository(gallery_entity_1.GalleryImage);
-    console.log('Seeding Gallery...');
-    const galleryImages = [
-        { title: 'Classroom', category: gallery_entity_1.GalleryCategory.CLASSROOM, public_url: '/assets/class.jpeg', s3_key: 'local-seed-class' },
-        { title: 'Classroom Session', category: gallery_entity_1.GalleryCategory.CLASSROOM, public_url: '/assets/class1.jpeg', s3_key: 'local-seed-class1' },
-        { title: 'Event', category: gallery_entity_1.GalleryCategory.EVENTS, public_url: '/assets/event.jpeg', s3_key: 'local-seed-event' },
-        { title: 'Event Highlight', category: gallery_entity_1.GalleryCategory.EVENTS, public_url: '/assets/event1.jpeg', s3_key: 'local-seed-event1' },
-        { title: 'Office Space', category: gallery_entity_1.GalleryCategory.OFFICE, public_url: '/assets/office.jpeg', s3_key: 'local-seed-office' },
-        { title: 'Recruitment Drive', category: gallery_entity_1.GalleryCategory.EVENTS, public_url: '/assets/recruitment.jpeg', s3_key: 'local-seed-recruitment' },
-    ];
-    for (const img of galleryImages) {
-        const existing = await galleryRepo.findOne({ where: { s3_key: img.s3_key } });
-        if (!existing) {
-            await galleryRepo.save(galleryRepo.create(img));
-        }
-    }
-    console.log('Gallery seeded');
     await app.close();
 }
 bootstrap();
