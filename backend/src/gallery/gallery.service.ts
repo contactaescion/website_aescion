@@ -67,15 +67,19 @@ export class GalleryService {
             publicUrl = `${baseUrl}/uploads/${fileName}`;
 
         } else {
-            await this.s3Client.send(new PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-                // ACL: 'public-read', // REMOVED for Private Bucket
-            }));
-            // We store the key, but public_url will be generated dynamically
-            publicUrl = `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`;
+            try {
+                await this.s3Client.send(new PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                }));
+                // We store the key, but public_url will be generated dynamically
+                publicUrl = `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${key}`;
+            } catch (error) {
+                console.error('S3 Upload Error:', error);
+                throw new Error(`S3 Upload Failed: ${error.message} (Bucket: ${this.bucketName}, Region: ${this.configService.get<string>('AWS_REGION')})`);
+            }
         }
 
         const image = this.galleryRepository.create({
