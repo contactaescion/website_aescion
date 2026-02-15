@@ -69,13 +69,19 @@ let GalleryService = class GalleryService {
             publicUrl = `${baseUrl}/uploads/${fileName}`;
         }
         else {
-            await this.s3Client.send(new client_s3_1.PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-            }));
-            publicUrl = `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${key}`;
+            try {
+                await this.s3Client.send(new client_s3_1.PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                }));
+                publicUrl = `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${key}`;
+            }
+            catch (error) {
+                console.error('S3 Upload Error:', error);
+                throw new Error(`S3 Upload Failed: ${error.message} (Bucket: ${this.bucketName}, Region: ${this.configService.get('AWS_REGION')})`);
+            }
         }
         const image = this.galleryRepository.create({
             title,

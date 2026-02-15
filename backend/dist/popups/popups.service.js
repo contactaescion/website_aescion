@@ -64,7 +64,7 @@ let PopupsService = class PopupsService {
         this.popupsRepository = popupsRepository;
         this.configService = configService;
         this.s3Client = new client_s3_1.S3Client({
-            region: this.configService.get('AWS_REGION') || 'us-east-1',
+            region: this.configService.get('AWS_REGION') || 'eu-north-1',
             credentials: {
                 accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID') || '',
                 secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY') || '',
@@ -91,12 +91,18 @@ let PopupsService = class PopupsService {
                 publicUrl = `${baseUrl}/uploads/${fileName}`;
             }
             else {
-                await this.s3Client.send(new client_s3_1.PutObjectCommand({
-                    Bucket: this.bucketName,
-                    Key: key,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
-                }));
+                try {
+                    await this.s3Client.send(new client_s3_1.PutObjectCommand({
+                        Bucket: this.bucketName,
+                        Key: key,
+                        Body: file.buffer,
+                        ContentType: file.mimetype,
+                    }));
+                }
+                catch (error) {
+                    console.error('S3 Popup Upload Error:', error);
+                    throw new Error(`S3 Popup Upload Failed: ${error.message}`);
+                }
                 const apiUrl = this.configService.get('API_URL') || 'http://localhost:3000';
                 publicUrl = `${apiUrl}/images/proxy/${key}`;
             }
