@@ -19,7 +19,7 @@ export class PopupsService {
         private configService: ConfigService,
     ) {
         this.s3Client = new S3Client({
-            region: this.configService.get<string>('AWS_REGION') || 'us-east-1',
+            region: this.configService.get<string>('AWS_REGION') || 'eu-north-1',
             credentials: {
                 accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID') || '',
                 secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '',
